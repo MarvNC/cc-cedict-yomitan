@@ -15,6 +15,9 @@ The download links below will always point toward the latest release.
 
 ### Screenshots
 
+![chrome_𰻞𰻞麵_-_Wikiwand_-_Google_Chrome_2023-12-19_01-22-05](https://github.com/MarvNC/cc-cedict-yomitan/assets/17340496/7f032de8-2c0e-4fe5-8dcc-056b5d54c704)
+![chrome_𰻞𰻞麵_-_Wikiwand_-_Google_Chrome_2023-12-19_01-22-11](https://github.com/MarvNC/cc-cedict-yomitan/assets/17340496/c59ca4e7-736a-48c9-9b87-59ffa307e1ae)
+
 ## License
 
 The code in this repository is licensed under the MIT license. The released dictionaries are licensed under the [Creative Commons Attribution-ShareAlike Licence (V3.0)](https://creativecommons.org/licenses/by-sa/3.0/) that [CC-CEDICT is licensed under](https://cc-cedict.org/wiki/).
