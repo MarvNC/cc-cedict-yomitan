@@ -6,6 +6,8 @@ This repository contains automatically generated dictionaries for use with [Yomi
 
 This repository is automatically updated daily and the dictionary files are built from [the latest dumps](https://www.mdbg.net/chinese/dictionary?page=cedict) using the [convert script](./convert.js) in this repository.
 
+For more Yomitan dictionaries and tools, see [Yomichan Dictionaries](https://github.com/MarvNC/yomichan-dictionaries).
+
 ## Download CC-CEDICT for Yomitan
 
 The download links below will always point toward the latest release.
