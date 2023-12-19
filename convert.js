@@ -211,8 +211,10 @@ async function addTermEntry(
   await termDict.addTerm(termEntry.build());
 
   // Simp
-  termEntry.setTerm(simplified);
-  await termDict.addTerm(termEntry.build());
+  if (traditional !== simplified) {
+    termEntry.setTerm(simplified);
+    await termDict.addTerm(termEntry.build());
+  }
 }
 
 /**
