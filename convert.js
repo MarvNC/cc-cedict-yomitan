@@ -299,6 +299,14 @@ function parseLine(line) {
 }
 
 /**
+ * Lowercases and converts pinyin numbers to tones.
+ * @param {string} pinyin
+ */
+function normalizePinyin(pinyin) {
+  return pinyinNumbersToTone(pinyin.toLowerCase());
+}
+
+/**
  * Replaces all instances of pinyin numbers with tone numbers in a string.
  * @param {string} string
  * @returns
@@ -310,7 +318,7 @@ function replacePinyinNumbers(string) {
   if (pinyinMatches) {
     for (const match of pinyinMatches) {
       const pinyinOnly = match.substring(1, match.length - 1);
-      const pinyinTone = pinyinNumbersToTone(pinyinOnly);
+      const pinyinTone = normalizePinyin(pinyinOnly);
       string = string.replace(pinyinOnly, pinyinTone);
     }
   }
