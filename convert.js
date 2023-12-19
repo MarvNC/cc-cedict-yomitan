@@ -90,14 +90,19 @@ Craig Brelsford, for his extensive list of bird names
 Erik Peterson, for his work as the editor of CEDICT
 Paul Andrew Denisowski, the original creator of CEDICT`
     );
-  termDict.setIndex(index.build());
+
+  // Export term dict
+  await termDict.setIndex(index.build());
   const termDictStats = await termDict.export(buildDir);
   console.log(`Exported ${termDictStats.termCount} terms.`);
   console.log(`Wrote ${termZipName} to ${buildDir}.`);
 
-  // const hanziDictStats = await hanziDict.export(buildDir);
-  // console.log(`Exported ${hanziDictStats.termCount} terms.`);
-  // console.log(`Wrote ${hanziZipName} to ${buildDir}.`);
+  // Export hanzi dict
+  index.setTitle(`CC-CEDICT Hanzi [${creationDateClean}]`);
+  await hanziDict.setIndex(index.build());
+  const hanziDictStats = await hanziDict.export(buildDir);
+  console.log(`Exported ${hanziDictStats.kanjiCount} terms.`);
+  console.log(`Wrote ${hanziZipName} to ${buildDir}.`);
 })();
 
 /**
@@ -109,9 +114,9 @@ Paul Andrew Denisowski, the original creator of CEDICT`
 async function processLine(line, termDict, hanziDict) {
   const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
 
-  addTermEntry(termDict, traditional, simplified, pinyin, definitionArray);
+  await addTermEntry(termDict, traditional, simplified, pinyin, definitionArray);
 
-  addHanziEntry(hanziDict, traditional, simplified, pinyin, definitionArray);
+  await addHanziEntry(hanziDict, traditional, simplified, pinyin, definitionArray);
 }
 
 /**
@@ -133,9 +138,18 @@ async function addHanziEntry(
     return;
   }
 
-  const hanziEntry = new KanjiEntry(traditional);
-  hanziEntry.setOnyomi(pinyin);
-  // hanziEntry.addMeaning
+  const hanziEntry = new KanjiEntry(traditional)
+    .setOnyomi(pinyin)
+    .addMeaning(definitionArray);
+
+  // Trad
+  await hanziDict.addKanji(hanziEntry.build());
+
+  // Simp
+  if (traditional !== simplified) {
+    hanziEntry.setKanji(simplified);
+    await hanziDict.addKanji(hanziEntry.build());
+  }
 }
 
 /**
