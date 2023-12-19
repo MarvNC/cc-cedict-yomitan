@@ -101,7 +101,7 @@ Paul Andrew Denisowski, the original creator of CEDICT`
   index.setTitle(`CC-CEDICT Hanzi [${creationDateClean}]`);
   await hanziDict.setIndex(index.build());
   const hanziDictStats = await hanziDict.export(buildDir);
-  console.log(`Exported ${hanziDictStats.kanjiCount} terms.`);
+  console.log(`Exported ${hanziDictStats.kanjiCount} hanzi.`);
   console.log(`Wrote ${hanziZipName} to ${buildDir}.`);
 })();
 
@@ -114,9 +114,21 @@ Paul Andrew Denisowski, the original creator of CEDICT`
 async function processLine(line, termDict, hanziDict) {
   const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
 
-  await addTermEntry(termDict, traditional, simplified, pinyin, definitionArray);
+  await addTermEntry(
+    termDict,
+    traditional,
+    simplified,
+    pinyin,
+    definitionArray
+  );
 
-  await addHanziEntry(hanziDict, traditional, simplified, pinyin, definitionArray);
+  await addHanziEntry(
+    hanziDict,
+    traditional,
+    simplified,
+    pinyin,
+    definitionArray
+  );
 }
 
 /**
@@ -159,8 +171,7 @@ async function addHanziEntry(
 function isValidHanzi(hanzi) {
   if (hanzi.length !== 1) {
     if (hasUTF16SurrogatePairAt(hanzi, 0)) {
-      console.log(`Surrogate pair: ${hanzi}`);
-      return true;
+      return hanzi.length === 2;
     }
     return false;
   }
