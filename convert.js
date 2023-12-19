@@ -228,7 +228,11 @@ async function addTermEntry(
             data: {
               cccedict: 'headword',
             },
-            content: `【${traditional}・${simplified}】`,
+            content: `【${
+              traditional === simplified
+                ? traditional
+                : traditional + '・' + simplified
+            }】`,
           },
           definitionList,
         ],
