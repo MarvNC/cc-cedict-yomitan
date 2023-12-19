@@ -18,8 +18,8 @@ const hasUTF16SurrogatePairAt = require('@stdlib/assert-has-utf16-surrogate-pair
 const fileName = 'cedict_1_0_ts_utf-8_mdbg.txt';
 const buildDir = './build';
 
-const termZipName = '[ZH-EN] CC-CEDICT.zip';
-const hanziZipName = '[Hanzi] CC-CEDICT.zip';
+const termZipName = 'CC-CEDICT.zip';
+const hanziZipName = 'CC-CEDICT Hanzi.zip';
 
 (async () => {
   // Check for file existence
