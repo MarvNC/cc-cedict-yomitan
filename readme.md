@@ -1,4 +1,4 @@
-# CC-CEDICT for Yomitan
+# CC-CEDICT for Yomichan/Yomitan
 
 [![](https://img.shields.io/github/v/tag/marvnc/cc-cedict-yomitan?style=for-the-badge&label=Last%20Release)](https://github.com/MarvNC/cc-cedict-yomitan/releases/latest)
 
