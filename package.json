@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build": "node ./convert.js"
+  },
   "dependencies": {
     "@stdlib/assert-has-utf16-surrogate-pair-at": "^0.1.0",
     "pinyin-tone": "^2.2.0",

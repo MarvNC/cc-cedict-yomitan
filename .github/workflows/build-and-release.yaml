@@ -1,0 +1,35 @@
+name: Build and Release Dictionaries Daily
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Latest Dump
+        run: ./fetch-cedict.sh
+
+      - name: Get Current Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Install Dependencies and Build
+        run: |
+          npm install
+          npm run build
+
+      - name: Create and Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/*
+          tag_name: ${{ steps.date.outputs.date }}
+          name: ${{ steps.date.outputs.date }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            This is an automated release of the latest CC-CEDICT dictionaries for ${{ steps.date.outputs.date }}.
