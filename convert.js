@@ -9,8 +9,10 @@ const {
 } = require('yomichan-dict-builder');
 
 const pinyinConvert = require('pinyin-tone');
+const hasUTF16SurrogatePairAt = require('@stdlib/assert-has-utf16-surrogate-pair-at');
 
 const fileName = 'cedict_1_0_ts_utf-8_mdbg.txt';
+const buildDir = './build';
 
 const termZipName = '[ZH-EN] CC-CEDICT.zip';
 const hanziZipName = '[Hanzi] CC-CEDICT.zip';
@@ -53,10 +55,49 @@ const hanziZipName = '[Hanzi] CC-CEDICT.zip';
   });
 
   // Parse entries
-  for (const line of lines) {
-    processLine(line, termDict, hanziDict);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    await processLine(line, termDict, hanziDict);
+    if (i % 1000 === 0) {
+      console.log(`Processed ${i} lines...`);
+    }
   }
-  console.log(`Parsed ${lines.length} lines`);
+
+  console.log(`Parsed ${lines.length} lines.`);
+  console.log(`Exporting dictionaries...`);
+
+  const index = new DictionaryIndex()
+    .setTitle(`CC-CEDICT [${creationDateClean}]`)
+    .setDescription(
+      `CC-CEDICT is a continuation of the CEDICT project started by Paul Denisowski in 1997 with the aim to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin for the Chinese characters.
+    This dictionary for Yomitan was converted using https://github.com/MarvNC/cc-cedict-yomitan and https://github.com/MarvNC/yomichan-dict-builder.`
+    )
+    .setRevision(creationDateClean)
+    .setAuthor('MDBG, CC-CEDICT, Marv')
+    .setUrl('')
+    .setAttribution(
+      `Thanks go out to everyone who submitted new words or corrections. Special thanks go out to the CC-CEDICT editor team, who spend many hours doing research to maintain a high quality level:
+
+goldyn_chyld - Matic Kavcic
+richwarm - Richard Warmington
+vermillion - Julien Baley
+ycandau - Yves Candau
+feilipu
+and the editors who wish to remain anonymous
+Special thanks to:
+
+Craig Brelsford, for his extensive list of bird names
+Erik Peterson, for his work as the editor of CEDICT
+Paul Andrew Denisowski, the original creator of CEDICT`
+    );
+  termDict.setIndex(index.build());
+  const termDictStats = await termDict.export(buildDir);
+  console.log(`Exported ${termDictStats.termCount} terms.`);
+  console.log(`Wrote ${termZipName} to ${buildDir}.`);
+
+  // const hanziDictStats = await hanziDict.export(buildDir);
+  // console.log(`Exported ${hanziDictStats.termCount} terms.`);
+  // console.log(`Wrote ${hanziZipName} to ${buildDir}.`);
 })();
 
 /**
@@ -87,7 +128,30 @@ async function addHanziEntry(
   simplified,
   pinyin,
   definitionArray
-) {}
+) {
+  if (!isValidHanzi(traditional)) {
+    return;
+  }
+
+  const hanziEntry = new KanjiEntry(traditional);
+  hanziEntry.setOnyomi(pinyin);
+  // hanziEntry.addMeaning
+}
+
+/**
+ * Tests if a string is a valid hanzi character.
+ * @param {string} hanzi
+ */
+function isValidHanzi(hanzi) {
+  if (hanzi.length !== 1) {
+    if (hasUTF16SurrogatePairAt(hanzi, 0)) {
+      console.log(`Surrogate pair: ${hanzi}`);
+      return true;
+    }
+    return false;
+  }
+  return true;
+}
 
 /**
  * Adds a term entry to the dictionary.
@@ -144,11 +208,11 @@ async function addTermEntry(
   });
 
   // Trad
-  termDict.addTerm(termEntry.build());
+  await termDict.addTerm(termEntry.build());
 
   // Simp
   termEntry.setTerm(simplified);
-  termDict.addTerm(termEntry.build());
+  await termDict.addTerm(termEntry.build());
 }
 
 /**
