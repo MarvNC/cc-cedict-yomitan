@@ -8,7 +8,11 @@ const {
   TermEntry,
 } = require('yomichan-dict-builder');
 
-const pinyinConvert = require('pinyin-tone');
+/**
+ * @type {(string) => string}
+ */
+// @ts-ignore
+const pinyinNumbersToTone = require('pinyin-tone');
 const hasUTF16SurrogatePairAt = require('@stdlib/assert-has-utf16-surrogate-pair-at');
 
 const fileName = 'cedict_1_0_ts_utf-8_mdbg.txt';
@@ -36,7 +40,7 @@ const hanziZipName = '[Hanzi] CC-CEDICT.zip';
     comments.push(lines.shift());
   }
 
-  const creationDateLine = comments.find((c) => c.startsWith('#! date'));
+  const creationDateLine = comments.find((c) => c?.startsWith('#! date'));
   const creationDateText = creationDateLine?.split('=')[1]?.trim();
   if (!creationDateText) {
     throw new Error(
@@ -262,6 +266,7 @@ function parseLine(line) {
     simplified += lineArr.shift();
   }
   lineArr.shift(); // space
+  // @ts-ignore
   if (lineArr[0] !== '[') {
     throw new Error(`Expected [ before pinyin: ${line}`);
   }
@@ -279,7 +284,7 @@ function parseLine(line) {
   // Process
 
   // Convert pinyin to tone
-  pinyin = pinyinConvert(pinyin);
+  pinyin = pinyinNumbersToTone(pinyin);
 
   english = replacePinyinNumbers(english);
 
@@ -305,7 +310,7 @@ function replacePinyinNumbers(string) {
   if (pinyinMatches) {
     for (const match of pinyinMatches) {
       const pinyinOnly = match.substring(1, match.length - 1);
-      const pinyinTone = pinyinConvert(pinyinOnly);
+      const pinyinTone = pinyinNumbersToTone(pinyinOnly);
       string = string.replace(pinyinOnly, pinyinTone);
     }
   }
