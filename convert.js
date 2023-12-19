@@ -67,7 +67,88 @@ const hanziZipName = '[Hanzi] CC-CEDICT.zip';
  */
 async function processLine(line, termDict, hanziDict) {
   const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
-  
+
+  addTermEntry(termDict, traditional, simplified, pinyin, definitionArray);
+
+  addHanziEntry(hanziDict, traditional, simplified, pinyin, definitionArray);
+}
+
+/**
+ * Adds a hanzi entry to the dictionary.
+ * @param {Dictionary} hanziDict
+ * @param {string} traditional
+ * @param {string} simplified
+ * @param {string} pinyin
+ * @param {string[]} definitionArray
+ */
+async function addHanziEntry(
+  hanziDict,
+  traditional,
+  simplified,
+  pinyin,
+  definitionArray
+) {}
+
+/**
+ * Adds a term entry to the dictionary.
+ * @param {Dictionary} termDict
+ * @param {string} traditional
+ * @param {string} simplified
+ * @param {string} pinyin
+ * @param {string[]} definitionArray
+ */
+async function addTermEntry(
+  termDict,
+  traditional,
+  simplified,
+  pinyin,
+  definitionArray
+) {
+  const termEntry = new TermEntry(traditional).setReading(pinyin);
+  /**
+   * @type {import('yomichan-dict-builder/dist/types/yomitan/termbank').StructuredContent}
+   */
+  const definitionList = {
+    tag: 'ul',
+    data: {
+      cccedict: 'definition',
+    },
+    content: definitionArray.map((d) => ({
+      tag: 'li',
+      content: d,
+    })),
+  };
+
+  // Build definition
+  termEntry.addDetailedDefinition({
+    type: 'structured-content',
+    content: [
+      {
+        tag: 'div',
+        lang: 'zh',
+        content: [
+          {
+            tag: 'div',
+            style: {
+              fontSize: '1.5em',
+            },
+            data: {
+              cccedict: 'headword',
+            },
+            content: `【${traditional}・${simplified}】`,
+          },
+          definitionList,
+        ],
+      },
+    ],
+  });
+
+  // Trad
+  termDict.addTerm(termEntry.build());
+
+  // Simp
+  termEntry.setTerm(simplified);
+  termDict.addTerm(termEntry.build());
 }
 
 /**
@@ -101,13 +182,10 @@ function parseLine(line) {
   if (lineArr[0] !== ' ') {
     throw new Error(`Expected space before english: ${line}`);
   }
+  lineArr.shift(); // space
   english = lineArr.join('');
 
   // Process
-
-  if (traditional === 'B格') {
-    debugger;
-  }
 
   // Convert pinyin to tone
   pinyin = pinyinConvert(pinyin);
@@ -139,7 +217,6 @@ function replacePinyinNumbers(string) {
       const pinyinTone = pinyinConvert(pinyinOnly);
       string = string.replace(pinyinOnly, pinyinTone);
     }
-    debugger;
   }
   return string;
 }

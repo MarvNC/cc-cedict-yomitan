@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "pinyin-tone": "^2.2.0",
-    "yomichan-dict-builder": "^1.1.0"
+    "yomichan-dict-builder": "^1.2.0"
   }
 }
