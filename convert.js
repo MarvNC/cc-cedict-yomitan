@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const {
   Dictionary,
   DictionaryIndex,
@@ -5,8 +8,7 @@ const {
   TermEntry,
 } = require('yomichan-dict-builder');
 
-const fs = require('fs');
-const path = require('path');
+const pinyinConvert = require('pinyin-tone');
 
 const fileName = 'cedict_1_0_ts_utf-8_mdbg.txt';
 
@@ -52,13 +54,92 @@ const hanziZipName = '[Hanzi] CC-CEDICT.zip';
 
   // Parse entries
   for (const line of lines) {
-    //
+    processLine(line, termDict, hanziDict);
   }
+  console.log(`Parsed ${lines.length} lines`);
 })();
 
 /**
- * @returns {import('yomichan-dict-builder/dist/types/yomitan/termbank').TermInformation}
+ * Given a line, adds the entry/hanzi information to the dictionary.
+ * @param {string} line
+ * @param {Dictionary} termDict
+ * @param {Dictionary} hanziDict
  */
-function parseLine() {
-  //
+async function processLine(line, termDict, hanziDict) {
+  const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
+  
+}
+
+/**
+ * Parses a line such as
+ * Traditional Simplified [pin1 yin1] /English equivalent 1/equivalent 2/
+ * @param {string} line
+ */
+function parseLine(line) {
+  const lineArr = line.split('');
+  let traditional = '';
+  let simplified = '';
+  let pinyin = '';
+  let english = '';
+
+  while (lineArr[0] !== ' ') {
+    traditional += lineArr.shift();
+  }
+  lineArr.shift(); // space
+  while (lineArr[0] !== ' ') {
+    simplified += lineArr.shift();
+  }
+  lineArr.shift(); // space
+  if (lineArr[0] !== '[') {
+    throw new Error(`Expected [ before pinyin: ${line}`);
+  }
+  lineArr.shift(); // [
+  while (lineArr[0] !== ']') {
+    pinyin += lineArr.shift();
+  }
+  lineArr.shift(); // ]
+  if (lineArr[0] !== ' ') {
+    throw new Error(`Expected space before english: ${line}`);
+  }
+  english = lineArr.join('');
+
+  // Process
+
+  if (traditional === 'B格') {
+    debugger;
+  }
+
+  // Convert pinyin to tone
+  pinyin = pinyinConvert(pinyin);
+
+  english = replacePinyinNumbers(english);
+
+  const definitionArray = english.split('/').filter((e) => e.trim() !== '');
+
+  return {
+    traditional,
+    simplified,
+    pinyin,
+    definitionArray,
+  };
+}
+
+/**
+ * Replaces all instances of pinyin numbers with tone numbers in a string.
+ * @param {string} string
+ * @returns
+ */
+function replacePinyinNumbers(string) {
+  // Find all pinyin within the definition and replace with tone
+  const pinyinRegex = /\[(([a-zA-Z]+)([1-5]) ?)+\]/g;
+  const pinyinMatches = string.match(pinyinRegex);
+  if (pinyinMatches) {
+    for (const match of pinyinMatches) {
+      const pinyinOnly = match.substring(1, match.length - 1);
+      const pinyinTone = pinyinConvert(pinyinOnly);
+      string = string.replace(pinyinOnly, pinyinTone);
+    }
+    debugger;
+  }
+  return string;
 }
