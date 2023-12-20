@@ -285,6 +285,7 @@ function parseLine(line) {
   // Process
 
   // Convert pinyin to tone
+  pinyin = pinyin.toLowerCase();
   pinyin = pinyinNumbersToTone(pinyin);
 
   // Remove spaces
