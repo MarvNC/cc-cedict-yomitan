@@ -222,9 +222,6 @@ async function addTermEntry(
         content: [
           {
             tag: 'div',
-            style: {
-              fontSize: '1.5em',
-            },
             data: {
               cccedict: 'headword',
             },
@@ -290,6 +287,10 @@ function parseLine(line) {
   // Convert pinyin to tone
   pinyin = pinyinNumbersToTone(pinyin);
 
+  // Remove spaces
+  pinyin = pinyin.replace(/ /g, '');
+
+  // Convert number pinyin in definition to tone
   english = replacePinyinNumbers(english);
 
   const definitionArray = english.split('/').filter((e) => e.trim() !== '');

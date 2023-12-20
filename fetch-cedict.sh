@@ -17,7 +17,7 @@ if [ $? -eq 0 ]; then
 
   # Unarchive the file
   echo "Unarchiving..."
-  gzip -d "$ARCHIVE_FILE"
+  gzip -df "$ARCHIVE_FILE"
 
   # Check if unarchiving was successful
   if [ $? -eq 0 ]; then
