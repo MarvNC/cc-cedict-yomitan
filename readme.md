@@ -2,11 +2,20 @@
 
 [![](https://img.shields.io/github/v/tag/marvnc/cc-cedict-yomitan?style=for-the-badge&label=Last%20Release)](https://github.com/MarvNC/cc-cedict-yomitan/releases/latest)
 
-This repository contains automatically generated dictionaries for use with [Yomitan](https://github.com/themoeway/yomitan)/[Yomichan](https://foosoft.net/projects/yomichan/), a free Japanese dictionary browser extension. The dictionaries are based on the [CC-CEDICT](https://cc-cedict.org/wiki/) project, which is a free Chinese-English dictionary.
+This repository contains automatically generated dictionaries for use with
+[Yomitan](https://github.com/themoeway/yomitan)/[Yomichan](https://foosoft.net/projects/yomichan/),
+a free Japanese dictionary browser extension. The dictionaries are based on the
+[CC-CEDICT](https://cc-cedict.org/wiki/) project, which is a free
+Chinese-English dictionary.
 
-This repository is automatically updated daily and the dictionary files are built from [the latest dumps](https://www.mdbg.net/chinese/dictionary?page=cedict) using the [convert script](./convert.js) in this repository.
+This repository is automatically updated daily and the dictionary files are
+built from
+[the latest dumps](https://www.mdbg.net/chinese/dictionary?page=cedict) using
+the [convert script](./convert.js) in this repository and built using
+[yomichan-dict-builder](https://github.com/MarvNC/yomichan-dict-builder).
 
-For more Yomitan dictionaries and tools, see [Yomichan Dictionaries](https://github.com/MarvNC/yomichan-dictionaries).
+For more Yomitan dictionaries and tools, see
+[Yomichan Dictionaries](https://github.com/MarvNC/yomichan-dictionaries).
 
 ## Download CC-CEDICT for Yomitan
 
@@ -22,4 +31,7 @@ The download links below will always point toward the latest release.
 
 ## License
 
-The code in this repository is licensed under the MIT license. The released dictionaries are licensed under the [Creative Commons Attribution-ShareAlike Licence (V3.0)](https://creativecommons.org/licenses/by-sa/3.0/) that [CC-CEDICT is licensed under](https://cc-cedict.org/wiki/).
+The code in this repository is licensed under the MIT license. The released
+dictionaries are licensed under the
+[Creative Commons Attribution-ShareAlike Licence (V3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
+that [CC-CEDICT is licensed under](https://cc-cedict.org/wiki/).
