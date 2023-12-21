@@ -78,7 +78,7 @@ const hanziZipName = 'CC-CEDICT Hanzi.zip';
     )
     .setRevision(creationDateClean)
     .setAuthor('MDBG, CC-CEDICT, Marv')
-    .setUrl('')
+    .setUrl('https://github.com/MarvNC/cc-cedict-yomitan')
     .setAttribution(
       `Thanks go out to everyone who submitted new words or corrections. Special thanks go out to the CC-CEDICT editor team, who spend many hours doing research to maintain a high quality level:
 
