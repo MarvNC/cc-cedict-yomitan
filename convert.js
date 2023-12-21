@@ -74,13 +74,14 @@ const hanziZipName = 'CC-CEDICT Hanzi.zip';
     .setTitle(`CC-CEDICT [${creationDateClean}]`)
     .setDescription(
       `CC-CEDICT is a continuation of the CEDICT project started by Paul Denisowski in 1997 with the aim to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin for the Chinese characters.
-    This dictionary for Yomitan was converted using https://github.com/MarvNC/cc-cedict-yomitan and https://github.com/MarvNC/yomichan-dict-builder.`
+    This dictionary for Yomitan was converted from the data available at https://www.mdbg.net/chinese/dictionary?page=cc-cedict using https://github.com/MarvNC/cc-cedict-yomitan and https://github.com/MarvNC/yomichan-dict-builder.`
     )
     .setRevision(creationDateClean)
     .setAuthor('MDBG, CC-CEDICT, Marv')
     .setUrl('https://github.com/MarvNC/cc-cedict-yomitan')
     .setAttribution(
-      `Thanks go out to everyone who submitted new words or corrections. Special thanks go out to the CC-CEDICT editor team, who spend many hours doing research to maintain a high quality level:
+      `https://cc-cedict.org/wiki/
+Thanks go out to everyone who submitted new words or corrections. Special thanks go out to the CC-CEDICT editor team, who spend many hours doing research to maintain a high quality level:
 
 goldyn_chyld - Matic Kavcic
 richwarm - Richard Warmington
