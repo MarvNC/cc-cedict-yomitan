@@ -286,8 +286,7 @@ function parseLine(line) {
   // Process
 
   // Convert pinyin to tone
-  pinyin = pinyin.toLowerCase();
-  pinyin = pinyinNumbersToTone(pinyin);
+  pinyin = normalizePinyin(pinyin);
 
   // Remove spaces
   pinyin = pinyin.replace(/ /g, '');
@@ -310,6 +309,7 @@ function parseLine(line) {
  * @param {string} pinyin
  */
 function normalizePinyin(pinyin) {
+  pinyin = pinyin.replace(/u:/g, 'v');
   return pinyinNumbersToTone(pinyin.toLowerCase());
 }
 
@@ -320,10 +320,11 @@ function normalizePinyin(pinyin) {
  */
 function replacePinyinNumbers(string) {
   // Find all pinyin within the definition and replace with tone
-  const pinyinRegex = /\[(([a-zA-Z]+)([1-5]) ?)+\]/g;
+  const pinyinRegex = /\[(([a-zA-Z\:]+)([1-5]) ?)+\]/g;
   const pinyinMatches = string.match(pinyinRegex);
   if (pinyinMatches) {
     for (const match of pinyinMatches) {
+      // Remove brackets
       const pinyinOnly = match.substring(1, match.length - 1);
       const pinyinTone = normalizePinyin(pinyinOnly);
       string = string.replace(pinyinOnly, pinyinTone);
