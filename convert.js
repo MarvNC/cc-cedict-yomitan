@@ -61,7 +61,7 @@ const hanziZipName = 'CC-CEDICT Hanzi.zip';
   // Parse entries
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    await processLine(line, termDict, hanziDict);
+    await processLine(line, termDict, hanziDict, i);
     if (i % 1000 === 0) {
       console.log(`Processed ${i} lines...`);
     }
@@ -94,7 +94,8 @@ Special thanks to:
 Craig Brelsford, for his extensive list of bird names
 Erik Peterson, for his work as the editor of CEDICT
 Paul Andrew Denisowski, the original creator of CEDICT`
-    );
+    )
+    .setSequenced(true);
 
   // Export term dict
   await termDict.setIndex(index.build());
@@ -115,8 +116,9 @@ Paul Andrew Denisowski, the original creator of CEDICT`
  * @param {string} line
  * @param {Dictionary} termDict
  * @param {Dictionary} hanziDict
+ * @param {number} lineNumber
  */
-async function processLine(line, termDict, hanziDict) {
+async function processLine(line, termDict, hanziDict, lineNumber) {
   const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
 
   await addTermEntry(
@@ -124,7 +126,8 @@ async function processLine(line, termDict, hanziDict) {
     traditional,
     simplified,
     pinyin,
-    definitionArray
+    definitionArray,
+    lineNumber
   );
 
   await addHanziEntry(
@@ -190,15 +193,19 @@ function isValidHanzi(hanzi) {
  * @param {string} simplified
  * @param {string} pinyin
  * @param {string[]} definitionArray
+ * @param {number} sequenceNumber
  */
 async function addTermEntry(
   termDict,
   traditional,
   simplified,
   pinyin,
-  definitionArray
+  definitionArray,
+  sequenceNumber
 ) {
-  const termEntry = new TermEntry(traditional).setReading(pinyin);
+  const termEntry = new TermEntry(traditional)
+    .setReading(pinyin)
+    .setSequenceNumber(sequenceNumber);
   /**
    * @type {import('yomichan-dict-builder/dist/types/yomitan/termbank').StructuredContent}
    */
