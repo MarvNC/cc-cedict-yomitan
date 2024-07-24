@@ -6,7 +6,8 @@ This repository contains automatically generated dictionaries for use with
 [Yomitan](https://github.com/themoeway/yomitan)/[Yomichan](https://foosoft.net/projects/yomichan/),
 a free Japanese dictionary browser extension. The dictionaries are based on the
 [CC-CEDICT](https://cc-cedict.org/wiki/) project, which is a free
-Chinese-English dictionary.
+Chinese-English dictionary that is
+[regularly updated](https://cc-cedict.org/editor/editor.php?handler=ListChanges).
 
 This repository is automatically updated daily and the dictionary files are
 built from
