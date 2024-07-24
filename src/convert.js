@@ -15,15 +15,16 @@ const {
 const pinyinNumbersToTone = require('pinyin-tone');
 const hasUTF16SurrogatePairAt = require('@stdlib/assert-has-utf16-surrogate-pair-at');
 
-const fileName = 'cedict_1_0_ts_utf-8_mdbg.txt';
-const buildDir = './build';
+const FILE_NAME = 'cedict_1_0_ts_utf-8_mdbg.txt';
+const BUILD_DIR = './build';
+const DATA_DIR = './data';
 
-const termZipName = 'CC-CEDICT.zip';
-const hanziZipName = 'CC-CEDICT Hanzi.zip';
+const TERM_ZIP_NAME = 'CC-CEDICT.zip';
+const HANZI_ZIP_NAME = 'CC-CEDICT Hanzi.zip';
 
 (async () => {
   // Check for file existence
-  const filePath = path.join(process.cwd(), fileName);
+  const filePath = path.join(process.cwd(), DATA_DIR, FILE_NAME);
   if (!fs.existsSync(filePath)) {
     throw new Error(
       `File not found: ${filePath}. Please run fetch-cedict.sh first to download the file.`
@@ -52,10 +53,10 @@ const hanziZipName = 'CC-CEDICT Hanzi.zip';
   console.log(`Creation date: ${creationDateClean}`);
 
   const termDict = new Dictionary({
-    fileName: termZipName,
+    fileName: TERM_ZIP_NAME,
   });
   const hanziDict = new Dictionary({
-    fileName: hanziZipName,
+    fileName: HANZI_ZIP_NAME,
   });
 
   // Parse entries
@@ -99,16 +100,16 @@ Paul Andrew Denisowski, the original creator of CEDICT`
 
   // Export term dict
   await termDict.setIndex(index.build());
-  const termDictStats = await termDict.export(buildDir);
+  const termDictStats = await termDict.export(BUILD_DIR);
   console.log(`Exported ${termDictStats.termCount} terms.`);
-  console.log(`Wrote ${termZipName} to ${buildDir}.`);
+  console.log(`Wrote ${TERM_ZIP_NAME} to ${BUILD_DIR}.`);
 
   // Export hanzi dict
   index.setTitle(`CC-CEDICT Hanzi [${creationDateClean}]`);
   await hanziDict.setIndex(index.build());
-  const hanziDictStats = await hanziDict.export(buildDir);
+  const hanziDictStats = await hanziDict.export(BUILD_DIR);
   console.log(`Exported ${hanziDictStats.kanjiCount} hanzi.`);
-  console.log(`Wrote ${hanziZipName} to ${buildDir}.`);
+  console.log(`Wrote ${HANZI_ZIP_NAME} to ${BUILD_DIR}.`);
 })();
 
 /**
