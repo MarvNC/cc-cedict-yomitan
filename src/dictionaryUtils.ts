@@ -41,7 +41,7 @@ async function addHanziEntry(
 
   const hanziEntry = new KanjiEntry(traditional)
     .setOnyomi(pinyin)
-    .addMeaning(definitionArray);
+    .addMeanings(definitionArray);
 
   // Trad
   await hanziDict.addKanji(hanziEntry.build());
