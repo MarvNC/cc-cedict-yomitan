@@ -11,6 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
 
       - name: Fetch Latest Dump
         run: sh ./fetch-cedict.sh
@@ -21,11 +22,11 @@ jobs:
 
       - name: Install Dependencies and Build
         run: |
-          npm install
-          npm run build
+          bun install --frozen-lockfile
+          bun run start
 
       - name: Create and Publish Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: build/*
           tag_name: ${{ steps.date.outputs.date }}
