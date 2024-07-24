@@ -1,19 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+import { existsSync } from 'fs';
+import { join } from 'path';
 
-const {
+import {
   Dictionary,
   DictionaryIndex,
   KanjiEntry,
   TermEntry,
-} = require('yomichan-dict-builder');
+} from 'yomichan-dict-builder';
 
-/**
- * @type {(string) => string}
- */
-// @ts-ignore
-const pinyinNumbersToTone = require('pinyin-tone');
-const hasUTF16SurrogatePairAt = require('@stdlib/assert-has-utf16-surrogate-pair-at');
+import pinyinNumbersToTone from 'pinyin-tone';
+import hasUTF16SurrogatePairAt from '@stdlib/assert-has-utf16-surrogate-pair-at';
 
 const FILE_NAME = 'cedict_1_0_ts_utf-8_mdbg.txt';
 const BUILD_DIR = './build';
@@ -22,23 +18,31 @@ const DATA_DIR = './data';
 const TERM_ZIP_NAME = 'CC-CEDICT.zip';
 const HANZI_ZIP_NAME = 'CC-CEDICT Hanzi.zip';
 
-(async () => {
+interface ParsedLine {
+  traditional: string;
+  simplified: string;
+  pinyin: string;
+  definitionArray: string[];
+}
+
+async function main() {
   // Check for file existence
-  const filePath = path.join(process.cwd(), DATA_DIR, FILE_NAME);
-  if (!fs.existsSync(filePath)) {
+  const filePath = join(process.cwd(), DATA_DIR, FILE_NAME);
+  if (!existsSync(filePath)) {
     throw new Error(
       `File not found: ${filePath}. Please run fetch-cedict.sh first to download the file.`
     );
   }
 
   // Read file
-  const fileContents = fs.readFileSync(filePath, { encoding: 'utf-8' });
+  const file = Bun.file(filePath);
+  const fileContents = await file.text();
   const lines = fileContents.split('\n');
 
   // Parse comments
-  const comments = [];
+  const comments: string[] = [];
   while (lines[0].startsWith('#')) {
-    comments.push(lines.shift());
+    comments.push(lines.shift()!);
   }
 
   const creationDateLine = comments.find((c) => c?.startsWith('#! date'));
@@ -110,16 +114,14 @@ Paul Andrew Denisowski, the original creator of CEDICT`
   const hanziDictStats = await hanziDict.export(BUILD_DIR);
   console.log(`Exported ${hanziDictStats.kanjiCount} hanzi.`);
   console.log(`Wrote ${HANZI_ZIP_NAME} to ${BUILD_DIR}.`);
-})();
+}
 
-/**
- * Given a line, adds the entry/hanzi information to the dictionary.
- * @param {string} line
- * @param {Dictionary} termDict
- * @param {Dictionary} hanziDict
- * @param {number} lineNumber
- */
-async function processLine(line, termDict, hanziDict, lineNumber) {
+async function processLine(
+  line: string,
+  termDict: Dictionary,
+  hanziDict: Dictionary,
+  lineNumber: number
+): Promise<void> {
   const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
 
   await addTermEntry(
@@ -140,21 +142,13 @@ async function processLine(line, termDict, hanziDict, lineNumber) {
   );
 }
 
-/**
- * Adds a hanzi entry to the dictionary.
- * @param {Dictionary} hanziDict
- * @param {string} traditional
- * @param {string} simplified
- * @param {string} pinyin
- * @param {string[]} definitionArray
- */
 async function addHanziEntry(
-  hanziDict,
-  traditional,
-  simplified,
-  pinyin,
-  definitionArray
-) {
+  hanziDict: Dictionary,
+  traditional: string,
+  simplified: string,
+  pinyin: string,
+  definitionArray: string[]
+): Promise<void> {
   if (!isValidHanzi(traditional)) {
     return;
   }
@@ -173,11 +167,7 @@ async function addHanziEntry(
   }
 }
 
-/**
- * Tests if a string is a valid hanzi character.
- * @param {string} hanzi
- */
-function isValidHanzi(hanzi) {
+function isValidHanzi(hanzi: string): boolean {
   if (hanzi.length !== 1) {
     if (hasUTF16SurrogatePairAt(hanzi, 0)) {
       return hanzi.length === 2;
@@ -187,39 +177,17 @@ function isValidHanzi(hanzi) {
   return true;
 }
 
-/**
- * Adds a term entry to the dictionary.
- * @param {Dictionary} termDict
- * @param {string} traditional
- * @param {string} simplified
- * @param {string} pinyin
- * @param {string[]} definitionArray
- * @param {number} sequenceNumber
- */
 async function addTermEntry(
-  termDict,
-  traditional,
-  simplified,
-  pinyin,
-  definitionArray,
-  sequenceNumber
-) {
+  termDict: Dictionary,
+  traditional: string,
+  simplified: string,
+  pinyin: string,
+  definitionArray: string[],
+  sequenceNumber: number
+): Promise<void> {
   const termEntry = new TermEntry(traditional)
     .setReading(pinyin)
     .setSequenceNumber(sequenceNumber);
-  /**
-   * @type {import('yomichan-dict-builder/dist/types/yomitan/termbank').StructuredContent}
-   */
-  const definitionList = {
-    tag: 'ul',
-    data: {
-      cccedict: 'definition',
-    },
-    content: definitionArray.map((d) => ({
-      tag: 'li',
-      content: d,
-    })),
-  };
 
   // Build definition
   termEntry.addDetailedDefinition({
@@ -240,7 +208,16 @@ async function addTermEntry(
                 : traditional + '・' + simplified
             }】`,
           },
-          definitionList,
+          {
+            tag: 'ul',
+            data: {
+              cccedict: 'definition',
+            },
+            content: definitionArray.map((d) => ({
+              tag: 'li',
+              content: d,
+            })),
+          },
         ],
       },
     ],
@@ -256,12 +233,7 @@ async function addTermEntry(
   }
 }
 
-/**
- * Parses a line such as
- * Traditional Simplified [pin1 yin1] /English equivalent 1/equivalent 2/
- * @param {string} line
- */
-function parseLine(line) {
+function parseLine(line: string): ParsedLine {
   const lineArr = line.split('');
   let traditional = '';
   let simplified = '';
@@ -312,21 +284,12 @@ function parseLine(line) {
   };
 }
 
-/**
- * Lowercases and converts pinyin numbers to tones.
- * @param {string} pinyin
- */
-function normalizePinyin(pinyin) {
+function normalizePinyin(pinyin: string): string {
   pinyin = pinyin.replace(/u:/g, 'v');
   return pinyinNumbersToTone(pinyin.toLowerCase());
 }
 
-/**
- * Replaces all instances of pinyin numbers with tone numbers in a string.
- * @param {string} string
- * @returns
- */
-function replacePinyinNumbers(string) {
+function replacePinyinNumbers(string: string): string {
   // Find all pinyin within the definition and replace with tone
   const pinyinRegex = /\[(([a-zA-Z\:]+)([1-5]) ?)+\]/g;
   const pinyinMatches = string.match(pinyinRegex);
@@ -340,3 +303,8 @@ function replacePinyinNumbers(string) {
   }
   return string;
 }
+
+main().catch((error) => {
+  console.error('An error occurred:', error);
+  process.exit(1);
+});

@@ -1,10 +1,21 @@
 {
+  "main": "src/convert.ts",
   "scripts": {
-    "build": "node ./src/convert.js"
+    "start": "bun run src/convert.ts"
   },
   "dependencies": {
     "@stdlib/assert-has-utf16-surrogate-pair-at": "^0.1.0",
     "pinyin-tone": "^2.2.0",
     "yomichan-dict-builder": "^1.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.12",
+    "@types/bun": "latest"
+  },
+  "name": "cc-cedict-yomitan",
+  "module": "index.ts",
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }
