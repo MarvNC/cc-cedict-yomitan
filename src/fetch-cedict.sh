@@ -3,9 +3,15 @@
 # URL of the file to download
 URL="https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
 
+# Directory to download the file into
+DATA_DIR="data"
+
 # File names
-ARCHIVE_FILE="cedict_1_0_ts_utf-8_mdbg.txt.gz"
-UNARCHIVED_FILE="cedict_1_0_ts_utf-8_mdbg.txt"
+ARCHIVE_FILE="$DATA_DIR/cedict_1_0_ts_utf-8_mdbg.txt.gz"
+UNARCHIVED_FILE="$DATA_DIR/cedict_1_0_ts_utf-8_mdbg.txt"
+
+# Create the directory if it doesn't exist
+mkdir -p "$DATA_DIR"
 
 # Download the file
 echo "Downloading..."
