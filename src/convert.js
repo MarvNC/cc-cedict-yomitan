@@ -23,7 +23,7 @@ const hanziZipName = 'CC-CEDICT Hanzi.zip';
 
 (async () => {
   // Check for file existence
-  const filePath = path.join(__dirname, fileName);
+  const filePath = path.join(process.cwd(), fileName);
   if (!fs.existsSync(filePath)) {
     throw new Error(
       `File not found: ${filePath}. Please run fetch-cedict.sh first to download the file.`
