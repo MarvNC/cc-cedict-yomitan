@@ -7,6 +7,8 @@ import {
   DATA_DIR,
   TERM_ZIP_NAME,
   HANZI_ZIP_NAME,
+  TERM_INDEX_NAME,
+  HANZI_INDEX_NAME,
 } from './config';
 import { processLine } from './dictionaryUtils';
 import { parseComments } from './fileUtils';
@@ -16,7 +18,7 @@ async function main() {
   const filePath = join(process.cwd(), DATA_DIR, FILE_NAME);
   if (!existsSync(filePath)) {
     throw new Error(
-      `File not found: ${filePath}. Please run fetch-cedict.sh first to download the file.`,
+      `File not found: ${filePath}. Please run fetch-cedict.sh first to download the file.`
     );
   }
 
@@ -47,12 +49,32 @@ async function main() {
   const index = createDictionaryIndex(creationDateClean);
 
   // Export term dict
+  index.setIndexUrl(
+    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${TERM_INDEX_NAME}`
+  );
+  index.setDownloadUrl(
+    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${TERM_ZIP_NAME}`
+  );
+  await Bun.write(
+    join(BUILD_DIR, TERM_INDEX_NAME),
+    JSON.stringify(index.build())
+  );
   await termDict.setIndex(index.build());
   const termDictStats = await termDict.export(BUILD_DIR);
   console.log(`Exported ${termDictStats.termCount} terms.`);
   console.log(`Wrote ${TERM_ZIP_NAME} to ${BUILD_DIR}.`);
 
   // Export hanzi dict
+  index.setIndexUrl(
+    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${HANZI_INDEX_NAME}`
+  );
+  index.setDownloadUrl(
+    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${HANZI_ZIP_NAME}`
+  );
+  await Bun.write(
+    join(BUILD_DIR, HANZI_INDEX_NAME),
+    JSON.stringify(index.build())
+  );
   index.setTitle(`CC-CEDICT Hanzi [${creationDateClean}]`);
   await hanziDict.setIndex(index.build());
   const hanziDictStats = await hanziDict.export(BUILD_DIR);
@@ -65,7 +87,7 @@ function createDictionaryIndex(creationDateClean: string): DictionaryIndex {
     .setTitle(`CC-CEDICT [${creationDateClean}]`)
     .setDescription(
       `CC-CEDICT is a continuation of the CEDICT project started by Paul Denisowski in 1997 with the aim to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin for the Chinese characters.
-    This dictionary for Yomitan was converted from the data available at https://www.mdbg.net/chinese/dictionary?page=cc-cedict using https://github.com/MarvNC/cc-cedict-yomitan and https://github.com/MarvNC/yomichan-dict-builder.`,
+    This dictionary for Yomitan was converted from the data available at https://www.mdbg.net/chinese/dictionary?page=cc-cedict using https://github.com/MarvNC/cc-cedict-yomitan and https://github.com/MarvNC/yomichan-dict-builder.`
     )
     .setRevision(creationDateClean)
     .setAuthor('MDBG, CC-CEDICT, Marv')
@@ -84,9 +106,10 @@ Special thanks to:
 
 Craig Brelsford, for his extensive list of bird names
 Erik Peterson, for his work as the editor of CEDICT
-Paul Andrew Denisowski, the original creator of CEDICT`,
+Paul Andrew Denisowski, the original creator of CEDICT`
     )
-    .setSequenced(true);
+    .setSequenced(true)
+    .setIsUpdatable(true);
 }
 
 main().catch((error) => {
