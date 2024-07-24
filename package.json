@@ -1,5 +1,4 @@
 {
-  "main": "src/main.ts",
   "scripts": {
     "start": "bun run src/main.ts"
   },
