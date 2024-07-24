@@ -1,6 +1,6 @@
 import { Dictionary, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { parseLine } from './parseLine';
-import hasUTF16SurrogatePairAt from '@stdlib/assert-has-utf16-surrogate-pair-at';
+import { isCJKHanzi } from 'is-cjk-hanzi';
 
 export async function processLine(
   line: string,
@@ -35,7 +35,7 @@ async function addHanziEntry(
   pinyin: string,
   definitionArray: string[]
 ): Promise<void> {
-  if (!isValidHanzi(traditional)) {
+  if (!isCJKHanzi(traditional)) {
     return;
   }
 
@@ -51,16 +51,6 @@ async function addHanziEntry(
     hanziEntry.setKanji(simplified);
     await hanziDict.addKanji(hanziEntry.build());
   }
-}
-
-function isValidHanzi(hanzi: string): boolean {
-  if (hanzi.length !== 1) {
-    if (hasUTF16SurrogatePairAt(hanzi, 0)) {
-      return hanzi.length === 2;
-    }
-    return false;
-  }
-  return true;
 }
 
 async function addTermEntry(
