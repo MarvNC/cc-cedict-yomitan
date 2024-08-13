@@ -9,6 +9,8 @@ import {
   HANZI_ZIP_NAME,
   TERM_INDEX_NAME,
   HANZI_INDEX_NAME,
+  ZHUYIN_ZIP_NAME,
+  ZHUYIN_INDEX_NAME,
 } from './config';
 import { processLine } from './dictionaryUtils';
 import { parseComments } from './fileUtils';
@@ -31,13 +33,14 @@ async function main() {
   const { creationDateClean } = parseComments(lines);
   console.log(`Creation date: ${creationDateClean}`);
 
-  const termDict = new Dictionary({ fileName: TERM_ZIP_NAME });
+  const pinyinDict = new Dictionary({ fileName: TERM_ZIP_NAME });
+  const zhuyinDict = new Dictionary({ fileName: ZHUYIN_ZIP_NAME });
   const hanziDict = new Dictionary({ fileName: HANZI_ZIP_NAME });
 
   // Parse entries
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    await processLine(line, termDict, hanziDict, i);
+    await processLine(line, pinyinDict, zhuyinDict, hanziDict, i);
     if (i % 1000 === 0) {
       console.log(`Processed ${i} lines...`);
     }
@@ -48,38 +51,54 @@ async function main() {
 
   const index = createDictionaryIndex(creationDateClean);
 
-  // Export term dict
-  index.setIndexUrl(
-    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${TERM_INDEX_NAME}`
+  // Export dictionaries
+  await exportDictionary(
+    index,
+    pinyinDict,
+    TERM_INDEX_NAME,
+    TERM_ZIP_NAME,
+    BUILD_DIR
   );
-  index.setDownloadUrl(
-    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${TERM_ZIP_NAME}`
+  await exportDictionary(
+    index,
+    zhuyinDict,
+    ZHUYIN_INDEX_NAME,
+    ZHUYIN_ZIP_NAME,
+    BUILD_DIR,
+    `CC-CEDICT Zhuyin [${creationDateClean}]`
   );
-  await Bun.write(
-    join(BUILD_DIR, TERM_INDEX_NAME),
-    JSON.stringify(index.build())
+  await exportDictionary(
+    index,
+    hanziDict,
+    HANZI_INDEX_NAME,
+    HANZI_ZIP_NAME,
+    BUILD_DIR,
+    `CC-CEDICT Hanzi [${creationDateClean}]`
   );
-  await termDict.setIndex(index.build());
-  const termDictStats = await termDict.export(BUILD_DIR);
-  console.log(`Exported ${termDictStats.termCount} terms.`);
-  console.log(`Wrote ${TERM_ZIP_NAME} to ${BUILD_DIR}.`);
+}
 
-  // Export hanzi dict
+async function exportDictionary(
+  index: DictionaryIndex,
+  dictionary: Dictionary,
+  indexName: string,
+  zipName: string,
+  buildDir: string,
+  title?: string
+) {
   index.setIndexUrl(
-    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${HANZI_INDEX_NAME}`
+    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${indexName}`
   );
   index.setDownloadUrl(
-    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${HANZI_ZIP_NAME}`
+    `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${zipName}`
   );
-  await Bun.write(
-    join(BUILD_DIR, HANZI_INDEX_NAME),
-    JSON.stringify(index.build())
-  );
-  index.setTitle(`CC-CEDICT Hanzi [${creationDateClean}]`);
-  await hanziDict.setIndex(index.build());
-  const hanziDictStats = await hanziDict.export(BUILD_DIR);
-  console.log(`Exported ${hanziDictStats.kanjiCount} hanzi.`);
-  console.log(`Wrote ${HANZI_ZIP_NAME} to ${BUILD_DIR}.`);
+  if (title) {
+    index.setTitle(title);
+  }
+  await Bun.write(join(buildDir, indexName), JSON.stringify(index.build()));
+  await dictionary.setIndex(index.build());
+  const dictStats = await dictionary.export(buildDir);
+  console.log(`Exported ${dictStats.termCount || dictStats.kanjiCount} items.`);
+  console.log(`Wrote ${zipName} to ${buildDir}.`);
 }
 
 function createDictionaryIndex(creationDateClean: string): DictionaryIndex {

@@ -5,7 +5,8 @@
   "dependencies": {
     "is-cjk-hanzi": "^1.0.0",
     "pinyin-tone": "^2.2.0",
-    "yomichan-dict-builder": "^2.7.0"
+    "yomichan-dict-builder": "^2.7.0",
+    "zhuyin-improved": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20.14.12",

@@ -4,18 +4,35 @@ import { isCJKHanzi } from 'is-cjk-hanzi';
 
 export async function processLine(
   line: string,
-  termDict: Dictionary,
+  pinyinDict: Dictionary,
+  zhuyinDict: Dictionary,
   hanziDict: Dictionary,
   lineNumber: number
 ): Promise<void> {
-  const { traditional, simplified, pinyin, definitionArray } = parseLine(line);
-
-  await addTermEntry(
-    termDict,
+  const {
     traditional,
     simplified,
     pinyin,
-    definitionArray,
+    zhuyin,
+    pinyinDefinitionArray,
+    zhuyinDefinitionArray,
+  } = parseLine(line);
+
+  await addTermEntry(
+    pinyinDict,
+    traditional,
+    simplified,
+    pinyin,
+    pinyinDefinitionArray,
+    lineNumber
+  );
+
+  await addTermEntry(
+    zhuyinDict,
+    traditional,
+    simplified,
+    zhuyin,
+    zhuyinDefinitionArray,
     lineNumber
   );
 
@@ -24,7 +41,7 @@ export async function processLine(
     traditional,
     simplified,
     pinyin,
-    definitionArray
+    pinyinDefinitionArray
   );
 }
 
@@ -57,12 +74,12 @@ async function addTermEntry(
   termDict: Dictionary,
   traditional: string,
   simplified: string,
-  pinyin: string,
+  reading: string,
   definitionArray: string[],
   sequenceNumber: number
 ): Promise<void> {
   const termEntry = new TermEntry(traditional)
-    .setReading(pinyin)
+    .setReading(reading)
     .setSequenceNumber(sequenceNumber);
 
   // Build definition
