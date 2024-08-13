@@ -1,11 +1,11 @@
-import { normalizePinyin, replacePinyinNumbers } from './pinyinUtils';
+import { getPinyin, getZhuyin, replacePinyinNumbers } from './pinyinUtils';
 import type { ParsedLine } from './types';
 
 export function parseLine(line: string): ParsedLine {
   const lineArr = line.split('');
   let traditional = '';
   let simplified = '';
-  let pinyin = '';
+  let pinyinNumbers = '';
   let english = '';
 
   while (lineArr[0] !== ' ') {
@@ -23,7 +23,7 @@ export function parseLine(line: string): ParsedLine {
   }
   lineArr.shift(); // [
   while (lineArr[0] !== ']') {
-    pinyin += lineArr.shift();
+    pinyinNumbers += lineArr.shift();
   }
   lineArr.shift(); // ]
   if (lineArr[0] !== ' ') {
@@ -33,21 +33,40 @@ export function parseLine(line: string): ParsedLine {
   english = lineArr.join('');
 
   // Process
-  // Convert pinyin to tone
-  pinyin = normalizePinyin(pinyin);
+  // Convert pinyin
+  const pinyin = getPinyin(pinyinNumbers);
 
-  // Remove spaces
-  pinyin = pinyin.replace(/ /g, '');
+  // Zhuyin
+  const zhuyin = getZhuyin(pinyinNumbers);
 
   // Convert number pinyin in definition to tone
-  english = replacePinyinNumbers(english);
-
-  const definitionArray = english.split('/').filter((e) => e.trim() !== '');
+  const { pinyinDefinitionArray, zhuyinDefinitionArray } =
+    processDefinitionText(english);
 
   return {
     traditional,
     simplified,
     pinyin,
-    definitionArray,
+    zhuyin,
+    pinyinDefinitionArray,
+    zhuyinDefinitionArray,
   };
+}
+
+function processDefinitionText(text: string): {
+  pinyinDefinitionArray: string[];
+  zhuyinDefinitionArray: string[];
+} {
+  const english = text;
+
+  const processText = (usePinyin: boolean) =>
+    replacePinyinNumbers(english, usePinyin)
+      .split('/')
+      .filter((e) => e.trim() !== '');
+
+  // Process pinyin and zhuyin
+  const pinyinDefinitionArray = processText(true);
+  const zhuyinDefinitionArray = processText(false);
+
+  return { pinyinDefinitionArray, zhuyinDefinitionArray };
 }

@@ -2,5 +2,7 @@ export interface ParsedLine {
   traditional: string;
   simplified: string;
   pinyin: string;
-  definitionArray: string[];
+  zhuyin: string;
+  pinyinDefinitionArray: string[];
+  zhuyinDefinitionArray: string[];
 }
