@@ -1,14 +1,25 @@
 import { Dictionary, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { parseLine } from './parseLine';
 import { isCJKHanzi } from 'is-cjk-hanzi';
+import type { CantoReadings } from './types';
 
-export async function processLine(
-  line: string,
-  pinyinDict: Dictionary,
-  zhuyinDict: Dictionary,
-  hanziDict: Dictionary,
-  lineNumber: number
-): Promise<void> {
+export async function processLine({
+  line,
+  pinyinDict,
+  zhuyinDict,
+  hanziDict,
+  cantoDict,
+  cantoReadings,
+  lineNumber,
+}: {
+  line: string;
+  pinyinDict: Dictionary;
+  zhuyinDict: Dictionary;
+  hanziDict: Dictionary;
+  cantoDict: Dictionary;
+  cantoReadings: CantoReadings;
+  lineNumber: number;
+}): Promise<void> {
   const {
     traditional,
     simplified,
@@ -43,6 +54,18 @@ export async function processLine(
     pinyin,
     pinyinDefinitionArray
   );
+
+  // Check if Canto reading exists
+  if (cantoReadings[traditional]) {
+    await addTermEntry(
+      cantoDict,
+      traditional,
+      simplified,
+      cantoReadings[traditional],
+      pinyinDefinitionArray,
+      lineNumber
+    );
+  }
 }
 
 async function addHanziEntry(

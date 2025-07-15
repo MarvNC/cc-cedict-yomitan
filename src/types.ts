@@ -6,3 +6,9 @@ export interface ParsedLine {
   pinyinDefinitionArray: string[];
   zhuyinDefinitionArray: string[];
 }
+
+type jyutping = string;
+
+export interface CantoReadings {
+  [traditional: string]: jyutping;
+}
