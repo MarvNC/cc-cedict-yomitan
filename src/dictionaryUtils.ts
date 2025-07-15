@@ -1,57 +1,105 @@
 import { Dictionary, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { parseLine } from './parseLine';
 import { isCJKHanzi } from 'is-cjk-hanzi';
+import type { CantoReadings } from './types';
 
-export async function processLine(
-  line: string,
-  pinyinDict: Dictionary,
-  zhuyinDict: Dictionary,
-  hanziDict: Dictionary,
-  lineNumber: number
-): Promise<void> {
+export async function processLine({
+  line,
+  pinyinDict,
+  zhuyinDict,
+  hanziDict,
+  ccCedictCantoDict,
+  ccCantoDict,
+  cantoReadings,
+  lineNumber,
+  isCanto = false,
+}: {
+  line: string;
+  pinyinDict?: Dictionary;
+  zhuyinDict?: Dictionary;
+  hanziDict?: Dictionary;
+  ccCedictCantoDict?: Dictionary;
+  cantoReadings?: CantoReadings;
+  ccCantoDict?: Dictionary;
+  lineNumber: number;
+  isCanto?: boolean;
+}): Promise<void> {
   const {
     traditional,
     simplified,
     pinyin,
     zhuyin,
+    jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
-  } = parseLine(line);
+    rawDefinitionArray,
+  } = parseLine(line, isCanto);
 
-  await addTermEntry(
-    pinyinDict,
+  await addTermEntry({
+    termDict: pinyinDict,
     traditional,
     simplified,
-    pinyin,
-    pinyinDefinitionArray,
-    lineNumber
-  );
+    reading: pinyin,
+    definitionArray: pinyinDefinitionArray,
+    sequenceNumber: lineNumber,
+  });
 
-  await addTermEntry(
-    zhuyinDict,
+  await addTermEntry({
+    termDict: zhuyinDict,
     traditional,
     simplified,
-    zhuyin,
-    zhuyinDefinitionArray,
-    lineNumber
-  );
+    reading: zhuyin,
+    definitionArray: zhuyinDefinitionArray,
+    sequenceNumber: lineNumber,
+  });
 
-  await addHanziEntry(
+  await addHanziEntry({
     hanziDict,
     traditional,
     simplified,
     pinyin,
-    pinyinDefinitionArray
-  );
+    definitionArray: pinyinDefinitionArray,
+  });
+
+  await addTermEntry({
+    termDict: ccCantoDict,
+    traditional,
+    simplified,
+    reading: jyutReading,
+    definitionArray: rawDefinitionArray,
+    sequenceNumber: lineNumber,
+  });
+
+  // Check if Canto reading exists
+  if (cantoReadings && cantoReadings[traditional]) {
+    await addTermEntry({
+      termDict: ccCedictCantoDict,
+      traditional,
+      simplified,
+      reading: cantoReadings[traditional],
+      definitionArray: pinyinDefinitionArray,
+      sequenceNumber: lineNumber,
+    });
+  }
 }
 
-async function addHanziEntry(
-  hanziDict: Dictionary,
-  traditional: string,
-  simplified: string,
-  pinyin: string,
-  definitionArray: string[]
-): Promise<void> {
+async function addHanziEntry({
+  hanziDict,
+  traditional,
+  simplified,
+  pinyin,
+  definitionArray,
+}: {
+  hanziDict?: Dictionary;
+  traditional: string;
+  simplified: string;
+  pinyin: string;
+  definitionArray: string[];
+}): Promise<void> {
+  if (!hanziDict) {
+    return;
+  }
+
   if (!isCJKHanzi(traditional)) {
     return;
   }
@@ -70,14 +118,25 @@ async function addHanziEntry(
   }
 }
 
-async function addTermEntry(
-  termDict: Dictionary,
-  traditional: string,
-  simplified: string,
-  reading: string,
-  definitionArray: string[],
-  sequenceNumber: number
-): Promise<void> {
+async function addTermEntry({
+  termDict,
+  traditional,
+  simplified,
+  reading,
+  definitionArray,
+  sequenceNumber,
+}: {
+  termDict?: Dictionary;
+  traditional: string;
+  simplified: string;
+  reading: string;
+  definitionArray: string[];
+  sequenceNumber: number;
+}): Promise<void> {
+  if (!termDict) {
+    return;
+  }
+
   const termEntry = new TermEntry(traditional)
     .setReading(reading)
     .setSequenceNumber(sequenceNumber);

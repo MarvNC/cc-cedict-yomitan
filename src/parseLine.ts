@@ -1,12 +1,12 @@
 import { getPinyin, getZhuyin, replacePinyinNumbers } from './pinyinUtils';
 import type { ParsedLine } from './types';
 
-export function parseLine(line: string): ParsedLine {
+export function parseLine(line: string, isCanto?: boolean): ParsedLine {
   const lineArr = line.split('');
   let traditional = '';
   let simplified = '';
-  let pinyinNumbers = '';
-  let english = '';
+  let rawReadingWithNumbers = '';
+  let rawEnglishDefinition = '';
 
   while (lineArr[0] !== ' ') {
     traditional += lineArr.shift();
@@ -23,33 +23,56 @@ export function parseLine(line: string): ParsedLine {
   }
   lineArr.shift(); // [
   while (lineArr[0] !== ']') {
-    pinyinNumbers += lineArr.shift();
+    rawReadingWithNumbers += lineArr.shift();
   }
   lineArr.shift(); // ]
   if (lineArr[0] !== ' ') {
     throw new Error(`Expected space before english: ${line}`);
   }
   lineArr.shift(); // space
-  english = lineArr.join('');
+
+  let jyutReading = '';
+  if (isCanto) {
+    if (lineArr[0] !== '{') {
+      throw new Error(`Expected { before jyut reading: ${line}`);
+    }
+    lineArr.shift(); // {
+    while (lineArr[0] !== '}') {
+      jyutReading += lineArr.shift();
+    }
+    lineArr.shift(); // }
+    if (lineArr[0] !== ' ') {
+      throw new Error(`Expected space after jyut reading: ${line}`);
+    }
+    lineArr.shift(); // space
+  }
+
+  rawEnglishDefinition = lineArr.join('');
 
   // Process
   // Convert pinyin
-  const pinyin = getPinyin(pinyinNumbers);
+  const pinyin = getPinyin(rawReadingWithNumbers);
 
   // Zhuyin
-  const zhuyin = getZhuyin(pinyinNumbers);
+  const zhuyin = getZhuyin(rawReadingWithNumbers);
 
   // Convert number pinyin in definition to tone
   const { pinyinDefinitionArray, zhuyinDefinitionArray } =
-    processDefinitionText(english);
+    processDefinitionText(rawEnglishDefinition);
+
+  const rawDefinitionArray = rawEnglishDefinition
+    .split('/')
+    .filter((e) => e.trim() !== '');
 
   return {
     traditional,
     simplified,
     pinyin,
     zhuyin,
+    jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
+    rawDefinitionArray,
   };
 }
 
