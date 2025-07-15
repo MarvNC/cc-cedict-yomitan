@@ -2,7 +2,8 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { Dictionary, DictionaryIndex } from 'yomichan-dict-builder';
 import {
-  FILE_NAME,
+  CC_CEDICT_FILE_NAME,
+  CC_CEDICT_CANTO_READINGS_FILE_NAME,
   BUILD_DIR,
   DATA_DIR,
   TERM_ZIP_NAME,
@@ -17,20 +18,29 @@ import { parseComments } from './fileUtils';
 
 async function main() {
   // Check for file existence
-  const filePath = join(process.cwd(), DATA_DIR, FILE_NAME);
-  if (!existsSync(filePath)) {
+  const ccCedictFilePath = join(process.cwd(), DATA_DIR, CC_CEDICT_FILE_NAME);
+  const ccCedictCantoReadingsFilePath = join(
+    process.cwd(),
+    DATA_DIR,
+    CC_CEDICT_CANTO_READINGS_FILE_NAME
+  );
+  if (!existsSync(ccCedictFilePath)) {
     throw new Error(
-      `File not found: ${filePath}. Please run fetch-cedict.sh first to download the file.`
+      `File not found: ${ccCedictFilePath}. Please run fetch-cedict.sh first to download the file.`
+    );
+  }
+  if (!existsSync(ccCedictCantoReadingsFilePath)) {
+    throw new Error(
+      `File not found: ${ccCedictCantoReadingsFilePath}. Please run fetch-cedict.sh first to download the file.`
     );
   }
 
   // Read file
-  const file = Bun.file(filePath);
-  const fileContents = await file.text();
-  const lines = fileContents.split('\n');
+  const ccCedictFile = Bun.file(ccCedictFilePath);
+  const ccCedictLines = (await ccCedictFile.text()).split('\n');
 
   // Parse comments
-  const { creationDateClean } = parseComments(lines);
+  const { creationDateClean } = parseComments(ccCedictLines);
   console.log(`Creation date: ${creationDateClean}`);
 
   const pinyinDict = new Dictionary({ fileName: TERM_ZIP_NAME });
@@ -38,53 +48,60 @@ async function main() {
   const hanziDict = new Dictionary({ fileName: HANZI_ZIP_NAME });
 
   // Parse entries
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  for (let i = 0; i < ccCedictLines.length; i++) {
+    const line = ccCedictLines[i];
     await processLine(line, pinyinDict, zhuyinDict, hanziDict, i);
     if (i % 1000 === 0) {
       console.log(`Processed ${i} lines...`);
     }
   }
 
-  console.log(`Parsed ${lines.length} lines.`);
+  console.log(`Parsed ${ccCedictLines.length} lines.`);
   console.log(`Exporting dictionaries...`);
 
   const index = createDictionaryIndex(creationDateClean);
 
   // Export dictionaries
-  await exportDictionary(
+  await exportDictionary({
     index,
-    pinyinDict,
-    TERM_INDEX_NAME,
-    TERM_ZIP_NAME,
-    BUILD_DIR
-  );
-  await exportDictionary(
+    dictionary: pinyinDict,
+    indexName: TERM_INDEX_NAME,
+    zipName: TERM_ZIP_NAME,
+    buildDir: BUILD_DIR,
+  });
+  await exportDictionary({
     index,
-    zhuyinDict,
-    ZHUYIN_INDEX_NAME,
-    ZHUYIN_ZIP_NAME,
-    BUILD_DIR,
-    `CC-CEDICT Zhuyin [${creationDateClean}]`
-  );
-  await exportDictionary(
+    dictionary: zhuyinDict,
+    indexName: ZHUYIN_INDEX_NAME,
+    zipName: ZHUYIN_ZIP_NAME,
+    buildDir: BUILD_DIR,
+    title: `CC-CEDICT Zhuyin [${creationDateClean}]`,
+  });
+  await exportDictionary({
     index,
-    hanziDict,
-    HANZI_INDEX_NAME,
-    HANZI_ZIP_NAME,
-    BUILD_DIR,
-    `CC-CEDICT Hanzi [${creationDateClean}]`
-  );
+    dictionary: hanziDict,
+    indexName: HANZI_INDEX_NAME,
+    zipName: HANZI_ZIP_NAME,
+    buildDir: BUILD_DIR,
+    title: `CC-CEDICT Hanzi [${creationDateClean}]`,
+  });
 }
 
-async function exportDictionary(
-  index: DictionaryIndex,
-  dictionary: Dictionary,
-  indexName: string,
-  zipName: string,
-  buildDir: string,
-  title?: string
-) {
+async function exportDictionary({
+  index,
+  dictionary,
+  indexName,
+  zipName,
+  buildDir,
+  title,
+}: {
+  index: DictionaryIndex;
+  dictionary: Dictionary;
+  indexName: string;
+  zipName: string;
+  buildDir: string;
+  title?: string;
+}) {
   index.setIndexUrl(
     `https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/${indexName}`
   );

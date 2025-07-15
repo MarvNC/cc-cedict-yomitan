@@ -1,4 +1,6 @@
-export const FILE_NAME = 'cedict_1_0_ts_utf-8_mdbg.txt';
+export const CC_CEDICT_FILE_NAME = 'cedict_1_0_ts_utf-8_mdbg.txt';
+export const CC_CEDICT_CANTO_READINGS_FILE_NAME =
+  'cccedict-canto-readings-150923.txt';
 export const BUILD_DIR = './build';
 export const DATA_DIR = './data';
 export const TERM_ZIP_NAME = 'CC-CEDICT.zip';
