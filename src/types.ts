@@ -3,6 +3,8 @@ export interface ParsedLine {
   simplified: string;
   pinyin: string;
   zhuyin: string;
+  jyutReading: string;
+  rawDefinitionArray: string[];
   pinyinDefinitionArray: string[];
   zhuyinDefinitionArray: string[];
 }

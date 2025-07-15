@@ -3,6 +3,7 @@
 # URL of the files to download
 URL="https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
 CANTO_URL="https://cccanto.org/cccedict-canto-readings-150923.zip"
+CCCANTO_URL="https://cccanto.org/cccanto-170202.zip"
 
 # Directory to download the file into
 DATA_DIR="data"
@@ -11,6 +12,7 @@ DATA_DIR="data"
 ARCHIVE_FILE="$DATA_DIR/cedict_1_0_ts_utf-8_mdbg.txt.gz"
 UNARCHIVED_FILE="$DATA_DIR/cedict_1_0_ts_utf-8_mdbg.txt"
 CANTO_ARCHIVE_FILE="$DATA_DIR/cccedict-canto-readings-150923.zip"
+CCCANTO_ARCHIVE_FILE="$DATA_DIR/cccanto-170202.zip"
 
 # Create the directory if it doesn't exist
 mkdir -p "$DATA_DIR"
@@ -59,4 +61,27 @@ if [ $? -eq 0 ]; then
   fi
 else
   echo "Cantonese readings download failed"
+fi
+
+# Download the CCCanto file
+echo "Downloading CCCanto..."
+wget "$CCCANTO_URL" -O "$CCCANTO_ARCHIVE_FILE"
+
+# Check if download was successful
+if [ $? -eq 0 ]; then
+  echo "CCCanto download successful"
+
+  # Unzip the file
+  echo "Unzipping CCCanto..."
+  unzip -o "$CCCANTO_ARCHIVE_FILE" -d "$DATA_DIR"
+
+  # Check if unzipping was successful
+  if [ $? -eq 0 ]; then
+    echo "CCCanto unzip successful"
+    echo "Files extracted to: $DATA_DIR"
+  else
+    echo "CCCanto unzip failed"
+  fi
+else
+  echo "CCCanto download failed"
 fi
