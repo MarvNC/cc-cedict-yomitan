@@ -29,7 +29,7 @@ The download links below will always point toward the latest release.
 **Mandarin with Pinyin:**
 
 - [CC-CEDICT](https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.zip)
-- [CC-CCDICT Hanzi](https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Hanzi.zip)
+- [CC-CEDICT Hanzi](https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Hanzi.zip)
 
 **Cantonese with Jyutping:**
 

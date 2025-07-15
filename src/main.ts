@@ -41,6 +41,11 @@ async function main() {
       `File not found: ${ccCedictCantoReadingsFilePath}. Please run fetch-cedict.sh first to download the file.`
     );
   }
+  if (!existsSync(ccCantoFilePath)) {
+    throw new Error(
+      `File not found: ${ccCantoFilePath}. Please run fetch-cedict.sh first to download the file.`
+    );
+  }
 
   // Read file
   const ccCedictFile = Bun.file(ccCedictFilePath);
