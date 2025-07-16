@@ -20,5 +20,8 @@
   },
   "trustedDependencies": [
     "core-js-pure"
-  ]
+  ],
+  "patchedDependencies": {
+    "zhuyin-improved@1.0.7": "patches/zhuyin-improved@1.0.7.patch"
+  }
 }
