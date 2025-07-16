@@ -17,5 +17,8 @@
   "type": "module",
   "peerDependencies": {
     "typescript": "^5.0.0"
-  }
+  },
+  "trustedDependencies": [
+    "core-js-pure"
+  ]
 }
