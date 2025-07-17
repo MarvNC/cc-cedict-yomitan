@@ -29,6 +29,5 @@ export function replacePinyinNumbers(string: string, pinyin: boolean): string {
 }
 
 export function getZhuyin(pinyin: string): string {
-  pinyin = replaceUWithV(pinyin);
-  return zhuyin(pinyin.toLowerCase()).join('');
+  return zhuyin(replaceUWithV(pinyin).toLowerCase(), false, true).join('');
 }
