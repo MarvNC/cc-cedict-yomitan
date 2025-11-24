@@ -12,9 +12,9 @@ export function replaceUWithV(pinyin: string) {
 }
 
 export function replacePinyinNumbers(string: string, pinyin: boolean): string {
-  // Add spaces after numbers where needed to help with zhuyin parsing
+  // Add spaces after numbers where needed to help with parsing
   string = string.replace(/(?<=\[).+?(?=\])/g, (match) =>
-    match.replace(/([1-5])(?![\s])/g, '$1 ')
+    match.replace(/([1-5])(?!\s|$)/g, '$1 ')
   );
   // Find all pinyin within the definition and replace with tone
   const pinyinRegex = /\[(([a-zA-Z\:]+)([1-5]) ?)+\]/g;
