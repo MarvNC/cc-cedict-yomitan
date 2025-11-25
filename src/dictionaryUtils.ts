@@ -2,6 +2,7 @@ import { Dictionary, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { parseLine } from './parseLine';
 import { isCJKHanzi } from 'is-cjk-hanzi';
 import type { CantoReadings } from './types';
+import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
 
 export async function processLine({
   line,
@@ -58,7 +59,7 @@ export async function processLine({
     traditional,
     simplified,
     pinyin,
-    definitionArray: pinyinDefinitionArray,
+    definitionArray: simplifyDefinitionArray(pinyinDefinitionArray),
   });
 
   await addTermEntry({
@@ -130,7 +131,7 @@ async function addTermEntry({
   traditional: string;
   simplified: string;
   reading: string;
-  definitionArray: string[];
+  definitionArray: StructuredContentNode[];
   sequenceNumber: number;
 }): Promise<void> {
   if (!termDict) {
@@ -183,4 +184,15 @@ async function addTermEntry({
     termEntry.setTerm(simplified);
     await termDict.addTerm(termEntry.build());
   }
+}
+
+function simplifyDefinitionArray(
+  definitionArray: StructuredContentNode[]
+): string[] {
+  return definitionArray.map((node) => {
+    // both should be strings based on current usage
+    if (typeof node === 'object' && 'content' in node)
+      return node.content as string;
+    else return node as string;
+  });
 }

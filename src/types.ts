@@ -1,3 +1,5 @@
+import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
+
 export interface ParsedLine {
   traditional: string;
   simplified: string;
@@ -5,8 +7,8 @@ export interface ParsedLine {
   zhuyin: string;
   jyutReading: string;
   rawDefinitionArray: string[];
-  pinyinDefinitionArray: string[];
-  zhuyinDefinitionArray: string[];
+  pinyinDefinitionArray: StructuredContentNode[];
+  zhuyinDefinitionArray: StructuredContentNode[];
 }
 
 type jyutping = string;

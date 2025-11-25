@@ -1,3 +1,4 @@
+import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
 import { getPinyin, getZhuyin, replacePinyinNumbers } from './pinyinUtils';
 import type { ParsedLine } from './types';
 
@@ -77,15 +78,29 @@ export function parseLine(line: string, isCanto?: boolean): ParsedLine {
 }
 
 function processDefinitionText(text: string): {
-  pinyinDefinitionArray: string[];
-  zhuyinDefinitionArray: string[];
+  pinyinDefinitionArray: StructuredContentNode[];
+  zhuyinDefinitionArray: StructuredContentNode[];
 } {
   const english = text;
 
   const processText = (usePinyin: boolean) =>
     replacePinyinNumbers(english, usePinyin)
       .split('/')
-      .filter((e) => e.trim() !== '');
+      .filter((e) => e.trim() !== '')
+      .map((defEntry) => {
+        const altPronunciationMatch = defEntry.match(/(.+) pr. \[(.+?)\]/);
+        if (altPronunciationMatch) {
+          return {
+            tag: 'span',
+            content: defEntry,
+            data: {
+              cccedict: 'alt-pronunciation',
+              type: altPronunciationMatch[1],
+            },
+          } satisfies StructuredContentNode;
+        }
+        return defEntry;
+      });
 
   // Process pinyin and zhuyin
   const pinyinDefinitionArray = processText(true);
