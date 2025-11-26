@@ -59,7 +59,7 @@ export async function processLine({
     traditional,
     simplified,
     pinyin,
-    definitionArray: simplifyStructedNodes(pinyinDefinitionArray),
+    definitionArray: simplifyStructuredNodes(pinyinDefinitionArray),
   });
 
   await addTermEntry({
@@ -188,7 +188,7 @@ async function addTermEntry({
 
 // generalistic function.
 // or maybe can have a different definition array for the Hanzi dic if it's too overkill?
-function simplifyStructedNodes(input: StructuredContentNode[]): string[] {
+function simplifyStructuredNodes(input: StructuredContentNode[]): string[] {
   function extractText(node: StructuredContentNode): string {
     if (typeof node === 'string') return node;
     else if (Array.isArray(node)) return node.map(extractText).join('');
@@ -197,7 +197,7 @@ function simplifyStructedNodes(input: StructuredContentNode[]): string[] {
       else if (Array.isArray(node.content))
         return node.content.map(extractText).join('');
     }
-    throw new Error(`Unknown node structure, ${node}`);
+    throw new Error(`Unknown node structure, ${JSON.stringify(node)}`);
   }
   return input.map(extractText);
 }
