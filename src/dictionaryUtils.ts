@@ -151,15 +151,13 @@ async function addTermEntry({
   ] as StructuredContentNode[];
   if (simplified !== traditional)
     terms.unshift(
-      ...([
-        {
-          tag: 'span',
-          content: traditional,
-          lang: 'zh-Hant',
-          data: { cccedict: 'headword-trad' },
-        },
-        '・',
-      ] as StructuredContentNode[])
+      {
+        tag: 'span',
+        content: traditional,
+        lang: 'zh-Hant',
+        data: { cccedict: 'headword-trad' },
+      },
+      '・'
     );
   // Build definition
   termEntry.addDetailedDefinition({
