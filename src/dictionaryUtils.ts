@@ -2,6 +2,7 @@ import { Dictionary, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { parseLine } from './parseLine';
 import { isCJKHanzi } from 'is-cjk-hanzi';
 import type { CantoReadings } from './types';
+import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
 
 export async function processLine({
   line,
@@ -140,7 +141,26 @@ async function addTermEntry({
   const termEntry = new TermEntry(traditional)
     .setReading(reading)
     .setSequenceNumber(sequenceNumber);
-
+  const terms = [
+    {
+      tag: 'span',
+      content: traditional,
+      lang: 'zh-Hant',
+      data: { cccedict: 'headword-trad' },
+    },
+  ] as StructuredContentNode[];
+  if (traditional !== simplified)
+    terms.push(
+      ...([
+        '・',
+        {
+          tag: 'span',
+          content: simplified,
+          lang: 'zh-Hans',
+          data: { cccedict: 'headword-simp' },
+        },
+      ] as StructuredContentNode[])
+    );
   // Build definition
   termEntry.addDetailedDefinition({
     type: 'structured-content',
@@ -154,11 +174,7 @@ async function addTermEntry({
             data: {
               cccedict: 'headword',
             },
-            content: `【${
-              traditional === simplified
-                ? traditional
-                : traditional + '・' + simplified
-            }】`,
+            content: ['【', terms, '】'],
           },
           {
             tag: 'ul',
