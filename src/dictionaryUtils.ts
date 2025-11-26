@@ -190,7 +190,8 @@ function simplifyDefinitionArray(
   definitionArray: StructuredContentNode[]
 ): string[] {
   return definitionArray.map((node) => {
-    // both should be strings based on current usage
+    // both should be strings based on current usage, change when necessary
+    // or maybe can have a separate definitionArray for hanzi entries
     if (typeof node === 'object' && 'content' in node)
       return node.content as string;
     else return node as string;
