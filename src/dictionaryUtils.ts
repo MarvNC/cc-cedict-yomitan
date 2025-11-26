@@ -144,21 +144,21 @@ async function addTermEntry({
   const terms = [
     {
       tag: 'span',
-      content: traditional,
-      lang: 'zh-Hant',
-      data: { cccedict: 'headword-trad' },
+      content: simplified,
+      lang: 'zh-Hans',
+      data: { cccedict: 'headword-simp' },
     },
   ] as StructuredContentNode[];
-  if (traditional !== simplified)
-    terms.push(
+  if (simplified !== traditional)
+    terms.unshift(
       ...([
-        '・',
         {
           tag: 'span',
-          content: simplified,
-          lang: 'zh-Hans',
-          data: { cccedict: 'headword-simp' },
+          content: traditional,
+          lang: 'zh-Hant',
+          data: { cccedict: 'headword-trad' },
         },
+        '・',
       ] as StructuredContentNode[])
     );
   // Build definition
