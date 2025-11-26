@@ -33,7 +33,7 @@ export async function processLine({
     jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
-    hanziDefinitionArray,
+    stringDefinitionArray,
     rawDefinitionArray,
   } = parseLine(line, isCanto);
 
@@ -60,7 +60,7 @@ export async function processLine({
     traditional,
     simplified,
     pinyin,
-    definitionArray: hanziDefinitionArray,
+    definitionArray: stringDefinitionArray,
   });
 
   await addTermEntry({

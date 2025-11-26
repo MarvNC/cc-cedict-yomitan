@@ -58,8 +58,11 @@ export function parseLine(line: string, isCanto?: boolean): ParsedLine {
   const zhuyin = getZhuyin(rawReadingWithNumbers);
 
   // Convert number pinyin in definition to tone
-  const { pinyinDefinitionArray, zhuyinDefinitionArray, hanziDefinitionArray } =
-    processDefinitionText(rawEnglishDefinition);
+  const {
+    pinyinDefinitionArray,
+    zhuyinDefinitionArray,
+    stringDefinitionArray,
+  } = processDefinitionText(rawEnglishDefinition);
 
   const rawDefinitionArray = rawEnglishDefinition
     .split('/')
@@ -73,7 +76,7 @@ export function parseLine(line: string, isCanto?: boolean): ParsedLine {
     jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
-    hanziDefinitionArray,
+    stringDefinitionArray,
     rawDefinitionArray,
   };
 }
@@ -81,7 +84,7 @@ export function parseLine(line: string, isCanto?: boolean): ParsedLine {
 function processDefinitionText(text: string): {
   pinyinDefinitionArray: StructuredContentNode[];
   zhuyinDefinitionArray: StructuredContentNode[];
-  hanziDefinitionArray: string[];
+  stringDefinitionArray: string[];
 } {
   const english = text;
 
@@ -124,7 +127,11 @@ function processDefinitionText(text: string): {
   // Process pinyin, zhuyin and hanzi definitions
   const pinyinDefinitionArray = processText('Pinyin');
   const zhuyinDefinitionArray = processText('Zhuyin');
-  const hanziDefinitionArray = processText('Hanzi');
+  const stringDefinitionArray = processText('Hanzi');
 
-  return { pinyinDefinitionArray, zhuyinDefinitionArray, hanziDefinitionArray };
+  return {
+    pinyinDefinitionArray,
+    zhuyinDefinitionArray,
+    stringDefinitionArray,
+  };
 }
