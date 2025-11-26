@@ -33,6 +33,7 @@ export async function processLine({
     jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
+    hanziDefinitionArray,
     rawDefinitionArray,
   } = parseLine(line, isCanto);
 
@@ -59,7 +60,7 @@ export async function processLine({
     traditional,
     simplified,
     pinyin,
-    definitionArray: simplifyStructuredNodes(pinyinDefinitionArray),
+    definitionArray: hanziDefinitionArray,
   });
 
   await addTermEntry({
@@ -184,20 +185,4 @@ async function addTermEntry({
     termEntry.setTerm(simplified);
     await termDict.addTerm(termEntry.build());
   }
-}
-
-// generalistic function.
-// or maybe can have a different definition array for the Hanzi dic if it's too overkill?
-function simplifyStructuredNodes(input: StructuredContentNode[]): string[] {
-  function extractText(node: StructuredContentNode): string {
-    if (typeof node === 'string') return node;
-    else if (Array.isArray(node)) return node.map(extractText).join('');
-    else if ('content' in node) {
-      if (typeof node.content === 'string') return node.content;
-      else if (Array.isArray(node.content))
-        return node.content.map(extractText).join('');
-    }
-    throw new Error(`Unknown node structure, ${JSON.stringify(node)}`);
-  }
-  return input.map(extractText);
 }

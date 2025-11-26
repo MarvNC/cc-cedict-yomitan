@@ -9,6 +9,7 @@ export interface ParsedLine {
   rawDefinitionArray: string[];
   pinyinDefinitionArray: StructuredContentNode[];
   zhuyinDefinitionArray: StructuredContentNode[];
+  hanziDefinitionArray: string[];
 }
 
 type jyutping = string;
