@@ -142,7 +142,24 @@ async function addTermEntry({
   const termEntry = new TermEntry(traditional)
     .setReading(reading)
     .setSequenceNumber(sequenceNumber);
-
+  const terms = [
+    {
+      tag: 'span',
+      content: simplified,
+      lang: 'zh-Hans',
+      data: { cccedict: 'headword-simp' },
+    },
+  ] as StructuredContentNode[];
+  if (simplified !== traditional)
+    terms.unshift(
+      {
+        tag: 'span',
+        content: traditional,
+        lang: 'zh-Hant',
+        data: { cccedict: 'headword-trad' },
+      },
+      '・'
+    );
   // Build definition
   termEntry.addDetailedDefinition({
     type: 'structured-content',
@@ -156,11 +173,7 @@ async function addTermEntry({
             data: {
               cccedict: 'headword',
             },
-            content: `【${
-              traditional === simplified
-                ? traditional
-                : traditional + '・' + simplified
-            }】`,
+            content: ['【', terms, '】'],
           },
           {
             tag: 'ul',
