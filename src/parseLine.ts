@@ -88,7 +88,7 @@ function processDefinitionText(text: string): {
       .split('/')
       .filter((e) => e.trim() !== '')
       .map((defEntry) => {
-        const altPronunciationMatch = defEntry.match(/(.+) pr. \[(.+?)\]/);
+        const altPronunciationMatch = defEntry.match(/(\w+) pr\. \[(.+?)\]/);
         if (altPronunciationMatch) {
           return {
             tag: 'span',
