@@ -1,3 +1,4 @@
+import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
 import { getPinyin, getZhuyin, replacePinyinNumbers } from './pinyinUtils';
 import type { ParsedLine } from './types';
 
@@ -57,8 +58,11 @@ export function parseLine(line: string, isCanto?: boolean): ParsedLine {
   const zhuyin = getZhuyin(rawReadingWithNumbers);
 
   // Convert number pinyin in definition to tone
-  const { pinyinDefinitionArray, zhuyinDefinitionArray } =
-    processDefinitionText(rawEnglishDefinition);
+  const {
+    pinyinDefinitionArray,
+    zhuyinDefinitionArray,
+    stringDefinitionArray,
+  } = processDefinitionText(rawEnglishDefinition);
 
   const rawDefinitionArray = rawEnglishDefinition
     .split('/')
@@ -72,24 +76,62 @@ export function parseLine(line: string, isCanto?: boolean): ParsedLine {
     jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
+    stringDefinitionArray,
     rawDefinitionArray,
   };
 }
 
 function processDefinitionText(text: string): {
-  pinyinDefinitionArray: string[];
-  zhuyinDefinitionArray: string[];
+  pinyinDefinitionArray: StructuredContentNode[];
+  zhuyinDefinitionArray: StructuredContentNode[];
+  stringDefinitionArray: string[];
 } {
   const english = text;
 
-  const processText = (usePinyin: boolean) =>
-    replacePinyinNumbers(english, usePinyin)
+  function processText(type: 'Pinyin' | 'Zhuyin'): StructuredContentNode[];
+  function processText(type: 'Hanzi'): string[];
+  function processText(type: 'Pinyin' | 'Zhuyin' | 'Hanzi') {
+    const stringDefinitions = replacePinyinNumbers(
+      english,
+      type !== 'Zhuyin' ? true : false
+    )
       .split('/')
       .filter((e) => e.trim() !== '');
+    if (type === 'Hanzi') return stringDefinitions;
 
-  // Process pinyin and zhuyin
-  const pinyinDefinitionArray = processText(true);
-  const zhuyinDefinitionArray = processText(false);
+    return stringDefinitions.map((defEntry) => {
+      const altPronunciationMatch = defEntry.match(
+        /(.*?)((\w+) pr\. \[(.+?)\])(.*)/
+      );
+      if (altPronunciationMatch) {
+        const [_, before, altPronunciationFull, label, pronunciation, after] =
+          altPronunciationMatch;
+        return [
+          before,
+          {
+            tag: 'span',
+            content: altPronunciationFull,
+            data: {
+              cccedict: 'alt-pronunciation',
+              type: label,
+              value: pronunciation,
+            },
+          },
+          after,
+        ] satisfies StructuredContentNode[];
+      }
+      return defEntry;
+    });
+  }
 
-  return { pinyinDefinitionArray, zhuyinDefinitionArray };
+  // Process pinyin, zhuyin and hanzi definitions
+  const pinyinDefinitionArray = processText('Pinyin');
+  const zhuyinDefinitionArray = processText('Zhuyin');
+  const stringDefinitionArray = processText('Hanzi');
+
+  return {
+    pinyinDefinitionArray,
+    zhuyinDefinitionArray,
+    stringDefinitionArray,
+  };
 }

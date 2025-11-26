@@ -2,6 +2,7 @@ import { Dictionary, KanjiEntry, TermEntry } from 'yomichan-dict-builder';
 import { parseLine } from './parseLine';
 import { isCJKHanzi } from 'is-cjk-hanzi';
 import type { CantoReadings } from './types';
+import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
 
 export async function processLine({
   line,
@@ -32,6 +33,7 @@ export async function processLine({
     jyutReading,
     pinyinDefinitionArray,
     zhuyinDefinitionArray,
+    stringDefinitionArray,
     rawDefinitionArray,
   } = parseLine(line, isCanto);
 
@@ -58,7 +60,7 @@ export async function processLine({
     traditional,
     simplified,
     pinyin,
-    definitionArray: pinyinDefinitionArray,
+    definitionArray: stringDefinitionArray,
   });
 
   await addTermEntry({
@@ -130,7 +132,7 @@ async function addTermEntry({
   traditional: string;
   simplified: string;
   reading: string;
-  definitionArray: string[];
+  definitionArray: StructuredContentNode[];
   sequenceNumber: number;
 }): Promise<void> {
   if (!termDict) {
