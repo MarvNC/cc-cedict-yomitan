@@ -59,7 +59,7 @@ export async function processLine({
     traditional,
     simplified,
     pinyin,
-    definitionArray: simplifyDefinitionArray(pinyinDefinitionArray),
+    definitionArray: simplifyStructedNodes(pinyinDefinitionArray),
   });
 
   await addTermEntry({
@@ -186,14 +186,18 @@ async function addTermEntry({
   }
 }
 
-function simplifyDefinitionArray(
-  definitionArray: StructuredContentNode[]
-): string[] {
-  return definitionArray.map((node) => {
-    // both should be strings based on current usage, change when necessary
-    // or maybe can have a separate definitionArray for hanzi entries
-    if (typeof node === 'object' && 'content' in node)
-      return node.content as string;
-    else return node as string;
-  });
+// generalistic function.
+// or maybe can have a different definition array for the Hanzi dic if it's too overkill?
+function simplifyStructedNodes(input: StructuredContentNode[]): string[] {
+  function extractText(node: StructuredContentNode): string {
+    if (typeof node === 'string') return node;
+    else if (Array.isArray(node)) return node.map(extractText).join('');
+    else if ('content' in node) {
+      if (typeof node.content === 'string') return node.content;
+      else if (Array.isArray(node.content))
+        return node.content.map(extractText).join('');
+    }
+    throw new Error(`Unknown node structure, ${node}`);
+  }
+  return input.map(extractText);
 }

@@ -88,16 +88,24 @@ function processDefinitionText(text: string): {
       .split('/')
       .filter((e) => e.trim() !== '')
       .map((defEntry) => {
-        const altPronunciationMatch = defEntry.match(/(\w+) pr\. \[(.+?)\]/);
+        const altPronunciationMatch = defEntry.match(
+          /(.*?)((\w+) pr\. \[(.+?)\])(.*)/
+        );
         if (altPronunciationMatch) {
-          return {
-            tag: 'span',
-            content: defEntry,
-            data: {
-              cccedict: 'alt-pronunciation',
-              type: altPronunciationMatch[1],
+          const [_, before, altPronunciationFull, label, pronunciation, after] =
+            altPronunciationMatch;
+          return [
+            before,
+            {
+              tag: 'span',
+              content: altPronunciationFull,
+              data: {
+                cccedict: 'alt-pronunciation',
+                type: label,
+              },
             },
-          } satisfies StructuredContentNode;
+            after,
+          ] satisfies StructuredContentNode[];
         }
         return defEntry;
       });
