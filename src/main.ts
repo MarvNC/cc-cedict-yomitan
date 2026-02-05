@@ -33,17 +33,17 @@ async function main() {
   const ccCantoFilePath = join(process.cwd(), DATA_DIR, CC_CANTO_FILE_NAME);
   if (!existsSync(ccCedictFilePath)) {
     throw new Error(
-      `File not found: ${ccCedictFilePath}. Please run fetch-cedict.sh first to download the file.`
+      `File not found: ${ccCedictFilePath}. Please run bun run fetch first to download the file.`
     );
   }
   if (!existsSync(ccCedictCantoReadingsFilePath)) {
     throw new Error(
-      `File not found: ${ccCedictCantoReadingsFilePath}. Please run fetch-cedict.sh first to download the file.`
+      `File not found: ${ccCedictCantoReadingsFilePath}. Please run bun run fetch first to download the file.`
     );
   }
   if (!existsSync(ccCantoFilePath)) {
     throw new Error(
-      `File not found: ${ccCantoFilePath}. Please run fetch-cedict.sh first to download the file.`
+      `File not found: ${ccCantoFilePath}. Please run bun run fetch first to download the file.`
     );
   }
 
