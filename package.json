@@ -1,16 +1,19 @@
 {
   "scripts": {
-    "start": "bun run src/main.ts"
+    "start": "bun run src/main.ts",
+    "fetch": "bun run src/fetch-cedict.ts"
   },
   "dependencies": {
     "is-cjk-hanzi": "^1.0.0",
     "pinyin-tone": "^2.2.0",
+    "unzipper": "^0.10.11",
     "yomichan-dict-builder": "^2.7.0",
     "zhuyin-improved": "^1.0.7"
   },
   "devDependencies": {
+    "@types/bun": "latest",
     "@types/node": "^20.14.12",
-    "@types/bun": "latest"
+    "@types/unzipper": "^0.10.10"
   },
   "name": "cc-cedict-yomitan",
   "module": "index.ts",

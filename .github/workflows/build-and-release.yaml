@@ -14,7 +14,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Fetch Latest Dump
-        run: sh ./src/fetch-cedict.sh
+        run: |
+          bun install --frozen-lockfile
+          bun run fetch
 
       - name: Get Current Date
         id: date
@@ -22,7 +24,6 @@ jobs:
 
       - name: Install Dependencies and Build
         run: |
-          bun install --frozen-lockfile
           bun run start
 
       - name: Create and Publish Release
