@@ -5,6 +5,9 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -14,3 +17,19 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun test
       - run: bun run typecheck
+      - name: Fetch dictionary source data
+        run: bun run fetch
+      - name: Build trial dictionaries
+        run: bun run start
+      - name: Record checksums
+        run: cd build && sha256sum *.zip > SHA256SUMS.txt
+      - name: Upload trial dictionaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: yomitan-trial-dictionaries
+          path: |
+            build/*.zip
+            build/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
