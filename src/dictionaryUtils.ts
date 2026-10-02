@@ -158,7 +158,7 @@ async function addTermEntry({
         lang: 'zh-Hant',
         data: { cccedict: 'headword-trad' },
       },
-      '・'
+      '・',
     );
   // Build definition
   termEntry.addDetailedDefinition({
@@ -166,7 +166,7 @@ async function addTermEntry({
     content: [
       {
         tag: 'div',
-        lang: 'zh',
+        lang: 'en',
         content: [
           {
             tag: 'div',

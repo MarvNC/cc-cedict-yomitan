@@ -1,37 +1,64 @@
 import pinyinNumbersToTone from 'pinyin-tone';
 import zhuyin from 'zhuyin-improved';
 
-export function getPinyin(pinyin: string): string {
-  pinyin = replaceUWithV(pinyin);
-  return pinyinNumbersToTone(pinyin.toLowerCase()).replace(/ /g, '');
-}
-
 export function replaceUWithV(pinyin: string) {
-  pinyin = pinyin.replace(/u:/g, 'v');
-  return pinyin;
+  return pinyin.replace(/u:/gi, (value) => (value[0] === 'U' ? 'V' : 'v'));
 }
 
-export function replacePinyinNumbers(string: string, pinyin: boolean): string {
-  // Add spaces after numbers where needed to help with parsing
-  string = string.replace(/(?<=\[).+?(?=\])/g, (match) =>
-    match.replace(/([1-5])(?!\s|$)/g, '$1 ')
+function convertReading(
+  reading: string,
+  pinyin: boolean,
+  preserveSpaces: boolean,
+): string {
+  // Convert individual numbered syllables, including joined v2 words. Preserve
+  // Latin material, braces, hyphens, punctuation and unknown syllables verbatim.
+  const input = reading;
+  let previousEnd = -1;
+  const result = input.replace(
+    /[A-Za-züÜvV:]+[1-5]/g,
+    (syllable, offset: number) => {
+      const normalized = replaceUWithV(syllable).toLowerCase();
+      let converted = pinyin
+        ? normalized === 'r5'
+          ? 'r'
+          : pinyinNumbersToTone(normalized)
+        : zhuyin(normalized, false, true).join('');
+      if (!converted || converted === normalized) return syllable;
+      if (pinyin && /^[A-Z]/.test(syllable))
+        converted = converted[0].toUpperCase() + converted.slice(1);
+      if (
+        pinyin &&
+        (offset === previousEnd ||
+          (!preserveSpaces &&
+            previousEnd >= 0 &&
+            /^ +$/.test(input.slice(previousEnd, offset)))) &&
+        /^[aeo]/i.test(syllable)
+      )
+        converted = "'" + converted;
+      previousEnd = offset + syllable.length;
+      return converted;
+    },
   );
-  // Find all pinyin within the definition and replace with tone
-  const pinyinRegex = /\[(([a-zA-Z\:]+)([1-5]) ?)+\]/g;
-  const pinyinMatches = string.match(pinyinRegex);
-  if (pinyinMatches) {
-    for (const match of pinyinMatches) {
-      // Remove brackets
-      const pinyinOnly = match.substring(1, match.length - 1);
-      const processedText = pinyin
-        ? getPinyin(pinyinOnly)
-        : getZhuyin(pinyinOnly);
-      string = string.replace(pinyinOnly, processedText);
-    }
-  }
-  return string;
+  return preserveSpaces ? result : result.replace(/ /g, '');
 }
 
-export function getZhuyin(pinyin: string): string {
-  return zhuyin(replaceUWithV(pinyin).toLowerCase(), false, true).join('');
+export function getPinyin(pinyin: string, preserveSpaces = false): string {
+  return convertReading(pinyin, true, preserveSpaces);
+}
+
+export function getZhuyin(pinyin: string, preserveSpaces = false): string {
+  return convertReading(pinyin, false, preserveSpaces);
+}
+
+export function replacePinyinNumbers(text: string, pinyin: boolean): string {
+  // Only bracketed numbered pronunciation notation is eligible. Bracketed
+  // English, editorial notes, and unsupported content must not be rewritten.
+  return text.replace(/\[([^\[\]]+)\]/g, (full, reading: string) => {
+    if (
+      !/[A-Za-züÜvV:]+[1-5]/.test(reading) ||
+      !/^[A-Za-züÜvV:0-9{} .,'·-]+$/.test(reading)
+    )
+      return full;
+    return `[${convertReading(reading, pinyin, true)}]`;
+  });
 }

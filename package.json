@@ -1,7 +1,9 @@
 {
   "scripts": {
     "start": "bun run src/main.ts",
-    "fetch": "bun run src/fetch-cedict.ts"
+    "fetch": "bun run src/fetch-cedict.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "is-cjk-hanzi": "^1.0.0",

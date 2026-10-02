@@ -74,6 +74,7 @@ async function main() {
   // Parse entries
   for (let i = 0; i < ccCedictLines.length; i++) {
     const line = ccCedictLines[i];
+    if (line.startsWith('#') || !line.trim()) continue;
     await processLineAndAddTermEntriesToDictionaries({
       line,
       pinyinDict,
