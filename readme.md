@@ -66,6 +66,6 @@ that [CC-CEDICT is licensed under](https://cc-cedict.org/wiki/).
 ## Definition formatting and development
 
 Definitions preserve CC-CEDICT's sense boundaries and editorial wording while
-adding clickable Chinese references, visible reference readings, and compact
+adding clickable Chinese references, smart ruby reference readings, and compact
 usage/classifier/pronunciation labels. See [formatting notes](docs/formatting.md)
 for source-format research, compatibility, fallbacks, and test commands.

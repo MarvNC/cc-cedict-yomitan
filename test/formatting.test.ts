@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'bun:test';
+import { processLine } from '../src/dictionaryUtils';
+import type { Dictionary } from 'yomichan-dict-builder';
 import { parseLine } from '../src/parseLine';
-import { formatDefinition } from '../src/definitionFormatting';
+import {
+  formatDefinition,
+  formatReferenceRuby,
+} from '../src/definitionFormatting';
 import { getPinyin, getZhuyin, replacePinyinNumbers } from '../src/pinyinUtils';
 import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
 
@@ -8,6 +13,19 @@ function flatten(node: StructuredContentNode): string {
   if (typeof node === 'string') return node;
   if (Array.isArray(node)) return node.map(flatten).join('');
   return 'content' in node && node.content ? flatten(node.content) : '';
+}
+
+function baseText(node: StructuredContentNode): string {
+  if (typeof node === 'string') return node;
+  if (Array.isArray(node)) return node.map(baseText).join('');
+  if (node.tag === 'rt') return '';
+  return 'content' in node && node.content ? baseText(node.content) : '';
+}
+function annotations(node: StructuredContentNode): string[] {
+  if (typeof node === 'string') return [];
+  if (Array.isArray(node)) return node.flatMap(annotations);
+  if (node.tag === 'rt') return [flatten(node)];
+  return 'content' in node && node.content ? annotations(node.content) : [];
 }
 
 describe('source structure', () => {
@@ -92,7 +110,8 @@ describe('rich notation without invented meanings', () => {
 
   test('classifiers and both scripts link independently', () => {
     const result = formatDefinition('CL:片[pian4],塊|块[kuai4]', true);
-    expect(flatten(result)).toBe('CL:片 [piàn],塊｜块 [kuài]');
+    expect(baseText(result)).toBe('CL:片,塊｜块');
+    expect(annotations(result)).toEqual(['piàn', 'kuài', 'kuài']);
     const json = JSON.stringify(result);
     expect(json).toContain('?query=%E5%A1%8A');
     expect(json).toContain('?query=%E5%9D%97');
@@ -100,7 +119,8 @@ describe('rich notation without invented meanings', () => {
   });
   test('non-BMP characters and punctuation references stay intact', () => {
     const result = formatDefinition('used in 鮟鱇|𩽾𩾌[an1kang1]', true);
-    expect(flatten(result)).toBe('used in 鮟鱇｜𩽾𩾌 [ānkāng]');
+    expect(baseText(result)).toBe('used in 鮟鱇｜𩽾𩾌');
+    expect(annotations(result)).toEqual(['ān', 'kāng', 'ān', 'kāng']);
     expect(JSON.stringify(result)).toContain(encodeURIComponent('𩽾𩾌'));
   });
   test('arbitrary parentheses and unknown brackets are literal', () => {
@@ -156,4 +176,79 @@ describe('numbered pronunciation', () => {
       '[x<y] [note] [abc7] [a1?]',
     );
   });
+});
+
+describe('smart reference ruby', () => {
+  test.each(['yin2 hang2', 'yin2hang2'])(
+    'aligns safe syllables: %s',
+    (reading) => {
+      const result = formatReferenceRuby('銀行', reading, true)!;
+      expect(baseText(result)).toBe('銀行');
+      expect(annotations(result)).toEqual(['yín', 'háng']);
+    },
+  );
+  test('traditional and simplified forms align independently', () => {
+    const result = formatDefinition('銀行|银行[yin2hang2]', true);
+    expect(baseText(result)).toBe('銀行｜银行');
+    expect(annotations(result)).toEqual(['yín', 'háng', 'yín', 'háng']);
+    expect(flatten(result)).not.toContain('[');
+  });
+  test.each([
+    ['花兒', 'hua1r5', 'huār'],
+    ['B超', 'B chao1', 'B chāo'],
+    ['3C產品', 'san1 C chan3 pin3', 'sān C chǎn pǐn'],
+    ['你好', 'ni3', 'nǐ'],
+    ['你好！', 'ni3hao3', 'nǐhǎo'],
+    ['兡', '{bai3ke4}', '{bǎikè}'],
+  ])('whole-term fallback for %s', (form, reading, annotation) => {
+    const result = formatReferenceRuby(form, reading, true)!;
+    expect(baseText(result)).toBe(form);
+    expect(annotations(result)).toEqual([annotation]);
+  });
+  test('different script lengths do not force alignment', () => {
+    const result = formatDefinition('甲乙|丙[jia3yi3]', true);
+    expect(annotations(result)).toEqual(['jiǎ', 'yǐ', 'jiǎyǐ']);
+  });
+  test('Zhuyin uses the same safe alignment', () => {
+    const result = formatReferenceRuby('銀行', 'yin2hang2', false)!;
+    expect(annotations(result)).toEqual(['ㄧㄣˊ', 'ㄏㄤˊ']);
+  });
+  test.each(['xx5', 'ni3 xx5', 'a1?', 'not pronunciation'])(
+    'unknown reading retains bracketed fallback: %s',
+    (reading) => {
+      expect(formatReferenceRuby('字', reading, true)).toBeUndefined();
+    },
+  );
+  test('unknown inline pronunciation is retained once', () => {
+    const result = formatDefinition('字[xx5]', true);
+    expect(flatten(result)).toBe('字 [xx5]');
+    expect(annotations(result)).toEqual([]);
+  });
+  test('CL tooltip remains available on its span', () => {
+    expect(JSON.stringify(formatDefinition('CL:個[ge4]', true))).toContain(
+      'Classifier / measure word',
+    );
+  });
+});
+
+test('dictionary output keeps original bullets and no added list spacing', async () => {
+  const entries: unknown[] = [];
+  const pinyinDict = {
+    addTerm: async (entry: unknown) => {
+      entries.push(entry);
+    },
+  } as unknown as Dictionary;
+  await processLine({
+    line: '麵包 面包 [[mian4bao1]] /bread/CL:片[pian4]/',
+    pinyinDict,
+    lineNumber: 1,
+  });
+  const content = JSON.stringify(entries);
+  expect(content).toContain('"tag":"ul"');
+  expect(content).not.toContain('"tag":"ol"');
+  expect(content).not.toContain('marginBottom');
+  expect(content).not.toContain('marginTop');
+  expect(content).not.toContain('paddingLeft');
+  expect(content).toContain('"tag":"ruby"');
+  expect(entries).toHaveLength(2);
 });

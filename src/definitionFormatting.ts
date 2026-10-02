@@ -1,5 +1,5 @@
 import type { StructuredContentNode } from 'yomichan-dict-builder/dist/types/yomitan/termbank';
-import { replacePinyinNumbers } from './pinyinUtils';
+import { getPinyin, getZhuyin, replacePinyinNumbers } from './pinyinUtils';
 
 // Only explicit editorial labels, not arbitrary parenthetical English glosses.
 const usageLabels = new Set([
@@ -56,6 +56,43 @@ function label(content: string, kind: string): StructuredContentNode {
   };
 }
 
+/** Annotate characters only when the source gives an unambiguous 1:1 mapping. */
+export function formatReferenceRuby(
+  form: string,
+  rawReading: string,
+  pinyin: boolean,
+): StructuredContentNode | undefined {
+  const convert = pinyin ? getPinyin : getZhuyin;
+  const converted = replacePinyinNumbers(`[${rawReading}]`, pinyin).slice(
+    1,
+    -1,
+  );
+  // Unsupported notation or unconverted numbered syllables retain the ordinary
+  // bracketed fallback, rather than asserting a pronunciation we cannot parse.
+  if (converted === rawReading || /[A-Za-züÜvV:]+[1-5]/.test(converted))
+    return undefined;
+  const syllables = rawReading.match(/[A-Za-züÜvV:]+[1-5]/g) ?? [];
+  const characters = Array.from(form);
+  const canAlign =
+    /^[\p{Script=Han}〇]+$/u.test(form) &&
+    rawReading.replace(/[A-Za-züÜvV:]+[1-5]/g, '').trim() === '' &&
+    !syllables.some((syllable) => /^r5$/i.test(syllable)) &&
+    syllables.length === characters.length;
+  const ruby = (base: string, reading: string): StructuredContentNode => ({
+    tag: 'ruby',
+    content: [
+      base,
+      { tag: 'rt', data: { cccedict: 'reference-reading' }, content: reading },
+    ],
+  });
+  if (canAlign)
+    return characters.map((character, index) =>
+      ruby(character, convert(syllables[index], true)),
+    );
+  // Erhua, mixed scripts, punctuation, and mismatched counts remain one unit.
+  return ruby(form, converted);
+}
+
 /** Format only source-encoded notation; unknown text remains literal. */
 export function formatDefinition(
   text: string,
@@ -86,12 +123,16 @@ export function formatDefinition(
     ) {
       const forms = headwords.split('|');
       const links: StructuredContentNode[] = [];
+      const readings = forms.map((form) =>
+        formatReferenceRuby(form, reading.slice(1, -1), pinyin),
+      );
+      const hasRuby = readings.every((value) => value !== undefined);
       forms.forEach((form, index) => {
         if (index) links.push('｜');
         links.push({
           tag: 'a',
           href: `?query=${encodeURIComponent(form)}`,
-          content: form,
+          content: hasRuby ? readings[index] : form,
           lang: forms.length === 1 ? 'zh' : index === 0 ? 'zh-Hant' : 'zh-Hans',
         });
       });
@@ -100,13 +141,17 @@ export function formatDefinition(
         data: { cccedict: 'reference' },
         content: [
           ...links,
-          ' ',
-          {
-            tag: 'span',
-            data: { cccedict: 'reference-reading' },
-            style: { fontSize: '0.85em' },
-            content: replacePinyinNumbers(reading, pinyin),
-          },
+          ...(hasRuby
+            ? []
+            : [
+                ' ',
+                {
+                  tag: 'span' as const,
+                  data: { cccedict: 'reference-reading' },
+                  style: { fontSize: '0.85em' },
+                  content: replacePinyinNumbers(reading, pinyin),
+                },
+              ]),
         ],
       });
     } else if (pronunciationLabel) {

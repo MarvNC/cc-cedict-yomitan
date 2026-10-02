@@ -176,14 +176,12 @@ async function addTermEntry({
             content: ['【', terms, '】'],
           },
           {
-            tag: definitionArray.length > 1 ? 'ol' : 'ul',
+            tag: 'ul',
             data: {
               cccedict: 'definition',
             },
-            style: { marginTop: '0.5em', paddingLeft: '1.5em' },
             content: definitionArray.map((d) => ({
               tag: 'li',
-              style: { marginBottom: '0.35em' },
               content: d,
             })),
           },

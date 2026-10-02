@@ -1,0 +1,14 @@
+{
+  "name": "cc-cedict-yomitan-import-integration",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --max-old-space-size=6144 roundtrip.mjs"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "6.2.5"
+  }
+}
