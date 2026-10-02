@@ -62,3 +62,10 @@ The code in this repository is licensed under the MIT license. The released
 dictionaries are licensed under the
 [Creative Commons Attribution-ShareAlike Licence (V3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
 that [CC-CEDICT is licensed under](https://cc-cedict.org/wiki/).
+
+## Definition formatting and development
+
+Definitions preserve CC-CEDICT's sense boundaries and editorial wording while
+adding clickable Chinese references, visible reference readings, and compact
+usage/classifier/pronunciation labels. See [formatting notes](docs/formatting.md)
+for source-format research, compatibility, fallbacks, and test commands.

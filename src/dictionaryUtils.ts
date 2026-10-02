@@ -158,7 +158,7 @@ async function addTermEntry({
         lang: 'zh-Hant',
         data: { cccedict: 'headword-trad' },
       },
-      '・'
+      '・',
     );
   // Build definition
   termEntry.addDetailedDefinition({
@@ -166,7 +166,7 @@ async function addTermEntry({
     content: [
       {
         tag: 'div',
-        lang: 'zh',
+        lang: 'en',
         content: [
           {
             tag: 'div',
@@ -176,12 +176,14 @@ async function addTermEntry({
             content: ['【', terms, '】'],
           },
           {
-            tag: 'ul',
+            tag: definitionArray.length > 1 ? 'ol' : 'ul',
             data: {
               cccedict: 'definition',
             },
+            style: { marginTop: '0.5em', paddingLeft: '1.5em' },
             content: definitionArray.map((d) => ({
               tag: 'li',
+              style: { marginBottom: '0.35em' },
               content: d,
             })),
           },
