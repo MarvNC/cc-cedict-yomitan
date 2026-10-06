@@ -1,0 +1,122 @@
+{
+  "version": "26.9.8.0",
+  "method": "Actual StructuredContentGenerator in jsdom; embedded unmodified rows; target-query lookup against sample/reference rows. No real browser click/extension route test.",
+  "headwords": 23,
+  "rows": 32,
+  "uniqueReferenceTargets": 20,
+  "rubyNodes": 65,
+  "destinationChecks": [
+    {
+      "target": "獨立顯卡",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "独立显卡",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "不用",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "道行",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "家",
+      "entries": 2,
+      "passed": true
+    },
+    {
+      "target": "個",
+      "entries": 2,
+      "passed": true
+    },
+    {
+      "target": "个",
+      "entries": 3,
+      "passed": true
+    },
+    {
+      "target": "阿富汗",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "鮮豔",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "鲜艳",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "鮟鱇",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "𩽾𩾌",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "麒麟",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "片",
+      "entries": 2,
+      "passed": true
+    },
+    {
+      "target": "塊",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "块",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "皸",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "皲",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "龜茲",
+      "entries": 1,
+      "passed": true
+    },
+    {
+      "target": "龟兹",
+      "entries": 1,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "source": "Official Yomitan Chrome release 26.9.8.0, js/display/structured-content-generator.js",
+  "staticLayout": "WeasyPrint 70.0 plus explicitly labeled document-only ruby placement shim, rasterized with Poppler; not Chromium",
+  "sampleAssertions": [
+    "All 32 after rows rendered across 23 distinct headwords",
+    "Before/after entry counts match generated data",
+    "Every definition list is UL; lists and LI items have no added styles",
+    "After glossary root language is en",
+    "65 native ruby nodes have nonempty rt annotations",
+    "Every reference anchor is internal with a nonempty query",
+    "All 20 unique reference queries resolve to unchanged sample or full-dictionary target rows"
+  ]
+}

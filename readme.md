@@ -51,6 +51,18 @@ The download links below will always point toward the latest release.
   Cantonese-specific entries. It is intended to be used alongside the CC-CEDICT
   Canto dictionary as they complement each other.
 
+### Testing a pull request build
+
+Open the pull request's **Test converter** workflow run and download an individual
+artifact, such as **CC-CEDICT**. Import that downloaded ZIP directly into Yomitan;
+its `index.json` and dictionary banks are at the root of the archive.
+
+Older runs offered one `yomitan-trial-dictionaries.zip` bundle. That bundle is
+**not** a dictionary: extract it once, then import the inner `CC-CEDICT.zip`
+(or another individual dictionary ZIP). Importing the outer bundle produces
+`No dictionary index found in archive`. GitHub's source-code ZIP is not a
+dictionary either.
+
 ### Screenshots
 
 ![chrome_𰻞𰻞麵_-_Wikiwand_-_Google_Chrome_2023-12-19_01-22-05](https://github.com/MarvNC/cc-cedict-yomitan/assets/17340496/7f032de8-2c0e-4fe5-8dcc-056b5d54c704)
@@ -62,3 +74,10 @@ The code in this repository is licensed under the MIT license. The released
 dictionaries are licensed under the
 [Creative Commons Attribution-ShareAlike Licence (V3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
 that [CC-CEDICT is licensed under](https://cc-cedict.org/wiki/).
+
+## Definition formatting and development
+
+Definitions preserve CC-CEDICT's sense boundaries and editorial wording while
+adding clickable Chinese references, smart ruby reference readings, and compact
+usage/classifier/pronunciation labels. See [formatting notes](docs/formatting.md)
+for source-format research, compatibility, fallbacks, and test commands.

@@ -1,0 +1,77 @@
+{
+  "validatedAt": "2026-10-02",
+  "yomitanVersion": "26.9.8.0",
+  "runtime": "Node.js 24.19.0; fake-indexeddb 6.2.5",
+  "scope": "Unmodified release importer/database under Node with fake-indexeddb; final archives with original bullets/no added list margins and smart reference ruby. Not installed-extension or native browser validation.",
+  "totalImported": 827704,
+  "structuredContentRoundtrips": 273,
+  "kanjiRoundtrips": 87,
+  "bulkExactWordLookups": 97,
+  "archives": [
+    {
+      "archive": "CC-CEDICT.Canto.zip",
+      "archiveSha256": "a0fcad07a5566eab6954f84052b116093c3e988fa8e7a2a9d2bef79e3f026cd7",
+      "totalImported": 166225,
+      "exactRoundtripAssertions": 71,
+      "structuredContentRoundtrips": 71,
+      "kanjiRoundtripAssertions": 0,
+      "bulkExactLookupWords": 25,
+      "negativeLookup": true,
+      "dictionaryIsolation": true,
+      "duplicateRejected": true,
+      "errors": []
+    },
+    {
+      "archive": "CC-CEDICT.Hanzi.zip",
+      "archiveSha256": "293d474c5b8741e712960495c5279310b5372d0e8c1353fb2b23b6a02db9793d",
+      "totalImported": 202970,
+      "exactRoundtripAssertions": 0,
+      "structuredContentRoundtrips": 0,
+      "kanjiRoundtripAssertions": 87,
+      "bulkExactLookupWords": 0,
+      "negativeLookup": true,
+      "dictionaryIsolation": true,
+      "duplicateRejected": true,
+      "errors": []
+    },
+    {
+      "archive": "CC-CEDICT.Zhuyin.zip",
+      "archiveSha256": "7cd7f3fc526ecbc53e79984f49593ac98791647dc981cdc882fcc0aab145c2b4",
+      "totalImported": 203031,
+      "exactRoundtripAssertions": 88,
+      "structuredContentRoundtrips": 88,
+      "kanjiRoundtripAssertions": 0,
+      "bulkExactLookupWords": 25,
+      "negativeLookup": true,
+      "dictionaryIsolation": true,
+      "duplicateRejected": true,
+      "errors": []
+    },
+    {
+      "archive": "CC-CEDICT.zip",
+      "archiveSha256": "1ebf50ae87cdf2a19b2844bf376a590d7a28cbb6c7cb821fff6f3026b1825ba1",
+      "totalImported": 203031,
+      "exactRoundtripAssertions": 88,
+      "structuredContentRoundtrips": 88,
+      "kanjiRoundtripAssertions": 0,
+      "bulkExactLookupWords": 25,
+      "negativeLookup": true,
+      "dictionaryIsolation": true,
+      "duplicateRejected": true,
+      "errors": []
+    },
+    {
+      "archive": "CC-Canto.zip",
+      "archiveSha256": "853cbcb201f94d95f2944a94d80f6f53e34c0684105979b535bfaac18435507a",
+      "totalImported": 52447,
+      "exactRoundtripAssertions": 26,
+      "structuredContentRoundtrips": 26,
+      "kanjiRoundtripAssertions": 0,
+      "bulkExactLookupWords": 22,
+      "negativeLookup": true,
+      "dictionaryIsolation": true,
+      "duplicateRejected": true,
+      "errors": []
+    }
+  ]
+}
